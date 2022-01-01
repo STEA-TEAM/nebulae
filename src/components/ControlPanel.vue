@@ -105,6 +105,20 @@
         :model-value="selectedReport"
         @update:modelValue="selectedReport = $event"
         style="min-width: 180px">
+        <template v-slot:option="item">
+          <q-item v-bind="item['itemProps']" dense>
+            <q-item-section>
+              <q-item-label>
+                {{ item['opt'].id }}
+              </q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-item-label caption>
+                {{ item['opt'].bytes }} Bytes
+              </q-item-label>
+            </q-item-section>
+          </q-item>
+        </template>
         <template v-slot:no-option>
           <q-item>
             <q-item-section class="text-italic text-grey">
@@ -213,6 +227,7 @@ export default defineComponent({
             })
           }
         });
+        console.log(reportList);
         this.reportList = reportList;
         if (reportList[0]) {
           this.selectedReport = reportList[0];

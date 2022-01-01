@@ -10,10 +10,13 @@
     "spa release": "quasar build",
     "android dev": "quasar dev -m capacitor -T android",
     "android build": "quasar build -m capacitor -T android",
+    "electron dev": "quasar dev -m electron",
+    "electron build": "quasar build -m electron",
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
+    "@electron/remote": "^2.0.1",
     "@quasar/extras": "^1.0.0",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
@@ -25,6 +28,8 @@
   "devDependencies": {
     "@babel/eslint-parser": "^7.13.14",
     "@quasar/app": "^3.0.0",
+    "electron": "^16.0.5",
+    "electron-packager": "^15.4.0",
     "eslint": "^7.14.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-vue": "^7.0.0",

@@ -57,57 +57,88 @@ export default defineComponent({
     },
   },
   setup(props) {
-    function parseReports(id, label, icon, reports) {
-      let reportsTree = {
-        id: id,
-        header: 'icon',
-        label: label,
-        icon: icon,
+    function parseReports(collectionIndex, collection) {
+      let reportTrees = [];
+      let reports = {};
+      let icons = {
+        'feature': 'mdi-arrow-left-right',
+        'input': 'mdi-import',
+        'output': 'mdi-export',
       };
-      if (reports.length) {
-        let featureReports = [];
-        reports.forEach(featureReport => {
-          let reportTree = {
-            id: `${id}.reportId:${featureReport['reportId']}`,
-            header: 'icon',
-            label: `reportId: ${featureReport['reportId']}`,
-            icon: 'mdi-identifier',
-          };
-          if (featureReport.items.length) {
+      for (const collectionKey in collection) {
+        let isReports = false
+        let type;
+        if (collectionKey === 'featureReports') {
+          isReports = true;
+          type = 'feature';
+        } else if (collectionKey === 'inputReports') {
+          isReports = true;
+          type = 'input';
+        } else if (collectionKey === 'outputReports') {
+          isReports = true;
+          type = 'output';
+        }
+        if (isReports) {
+          /** Start processing collection.xxxReports */
+          let reportIndex = 0;
+          collection[collectionKey].forEach((report) => {
+
+            /** Start processing collection.xxxReports[n].items */
+            let itemsTree = {
+              id: `collection_${collectionIndex}.reportId_${report.reportId}.${type}_report_${reportIndex}`,
+              header: 'icon',
+              label: `${type} report ${reportIndex}`,
+              icon: icons[type]
+            };
             let items = [];
-            let itemIndex = 1;
-            featureReport.items.forEach(item => {
+            let itemIndex = 0;
+            report.items.forEach((item) => {
               let itemTree = {
-                id: `${id}.reportId:${featureReport['reportId']}.item_${itemIndex}`,
+                id: `${itemsTree.id}.item_${itemIndex}`,
                 header: 'icon',
                 label: `item ${itemIndex}`,
-                children: [],
               };
+
+              /** Start processing collection.xxxReports[n].items[n] */
+              let itemPairs = [];
               for (const itemKey in item) {
-                if (itemKey === 'usages') {
-                  itemTree.children.push({
-                    id: `${id}.reportId:${featureReport['reportId']}.item_${itemIndex}.itemKey:[${item[itemKey].join(', ')}]`,
-                    header: 'icon',
-                    label: `${itemKey}: [${item[itemKey].join(', ')}]`,
-                  });
-                } else {
-                  itemTree.children.push({
-                    id: `${id}.reportId:${featureReport['reportId']}.item_${itemIndex}.itemKey:${item[itemKey]}`,
-                    header: 'icon',
-                    label: `${itemKey}: item[itemKey]`,
-                  });
-                }
+                itemPairs.push({
+                  id: `${itemTree.id}.${itemKey}`,
+                  header: 'icon',
+                  label: `${itemKey}: ${itemKey === 'usages' ? '[' + item[itemKey].join(', ') + ']' : item[itemKey]}`,
+                });
               }
+              /** End processing collection.xxxReports[n].items[n] */
+
+              itemTree['children'] = itemPairs;
               items.push(itemTree);
               itemIndex++;
             });
-            reportTree['children'] = items;
-          }
-          featureReports.push(reportTree);
-        });
-        reportsTree['children'] = featureReports;
+            if (items.length) {
+              itemsTree['children'] = items;
+            }
+            /** End processing collection.xxxReports[n].items */
+
+            if (!reports[report.reportId]) {
+              reports[report.reportId] = [];
+            }
+            reports[report.reportId].push(itemsTree);
+            reportIndex++;
+          });
+          /** End processing collection.xxxReports */
+        }
       }
-      return reportsTree;
+      for (const reportId in reports) {
+        let reportTree = {
+          id: `collection_${collectionIndex}.reportId_${reportId}`,
+          header: 'icon',
+          label: `reportId: ${reportId}`,
+          icon: 'mdi-identifier',
+          children: reports[reportId]
+        };
+        reportTrees.push(reportTree);
+      }
+      return reportTrees;
     }
 
     const deviceTree = computed(() => {
@@ -131,51 +162,30 @@ export default defineComponent({
 
       if (props.modelValue["collections"].length) {
         let collections = [];
-        let collectionIndex = 1;
+        let collectionIndex = 0;
         props.modelValue["collections"].forEach(collection => {
-          let outputReportsTree = parseReports(
-            `collection_${collectionIndex}.outputReports`,
-            'outputReports',
-            'mdi-export',
-            collection['outputReports']
-          );
-          let inputReportsTree = parseReports(
-            `collection_${collectionIndex}.inputReports`,
-            'inputReports',
-            'mdi-import',
-            collection['inputReports']
-          );
-          let featureReportsTree = parseReports(
-            `collection_${collectionIndex}.featureReports`,
-            'featureReports',
-            'mdi-feature-search-outline',
-            collection['featureReports']
-          );
           let collectionTree = {
             id: `collection_${collectionIndex}`,
             header: 'icon',
             label: `collection ${collectionIndex}`,
             icon: 'mdi-video-input-component',
-            children: [
-              outputReportsTree,
-              inputReportsTree,
-              featureReportsTree,
-            ],
+            children: parseReports(
+              collectionIndex,
+              collection
+            )
           }
           collections.push(collectionTree);
           collectionIndex++;
         });
         rootTree.children = collections;
       }
-
       return rootTree;
     });
     const expanded = ref(['root']);
     if (props.modelValue && deviceTree.value.hasOwnProperty('children')) {
       deviceTree.value.children.forEach(collection => {
-        if (collection.children[0].hasOwnProperty('children')) {
+        if (collection.hasOwnProperty('children')) {
           expanded.value.push(collection.id);
-          expanded.value.push(`${collection.id}.outputReports`);
         }
       });
     }

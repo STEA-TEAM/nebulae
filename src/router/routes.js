@@ -10,7 +10,6 @@ const routes = [
           default: () => import('pages/Dashboard'),
           drawer: () => import('layouts/drawers/MainDrawer'),
           header: () => import('layouts/headers/MainHeader'),
-          footer: () => import('layouts/footers/MainFooter'),
         }
       },
       {
