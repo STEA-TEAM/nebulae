@@ -3,7 +3,7 @@
     accordion
     v-model:expanded="expanded"
     node-key="id"
-    :nodes="[deviceTree]">
+    :nodes="deviceForest">
     <template v-slot:header-img="prop">
       <div class="row items-center q-gutter-x-sm">
         <q-avatar size="sm">
@@ -48,16 +48,15 @@
 import {computed, defineComponent, ref} from 'vue'
 
 export default defineComponent({
-  name: 'HidDeviceTree',
+  name: 'HidDeviceForest',
   props: {
     modelValue: {
-      type: Object,
-      default: () => {
-      },
+      type: Array,
+      default: () => [],
     },
   },
   setup(props) {
-    function parseReports(collectionIndex, collection) {
+    function parseReports(idPrefix, collection) {
       let reportTrees = [];
       let reports = {};
       let icons = {
@@ -85,7 +84,7 @@ export default defineComponent({
 
             /** Start processing collection.xxxReports[n].items */
             let itemsTree = {
-              id: `collection_${collectionIndex}.reportId_${report.reportId}.${type}_report_${reportIndex}`,
+              id: `${idPrefix}.reportId_${report.reportId}.${type}_report_${reportIndex}`,
               header: 'icon',
               label: `${type} report ${reportIndex}`,
               icon: icons[type]
@@ -130,7 +129,7 @@ export default defineComponent({
       }
       for (const reportId in reports) {
         let reportTree = {
-          id: `collection_${collectionIndex}.reportId_${reportId}`,
+          id: `${idPrefix}.reportId_${reportId}`,
           header: 'icon',
           label: `reportId: ${reportId}`,
           icon: 'mdi-identifier',
@@ -141,56 +140,64 @@ export default defineComponent({
       return reportTrees;
     }
 
-    const deviceTree = computed(() => {
-      if (!props.modelValue) {
-        return {};
-      }
-      let rootTree = {
-        id: 'root',
-        header: 'img',
-        label: props.modelValue.productName ? props.modelValue.productName : 'Anonymous',
-        avatar: props.modelValue.icon,
-        side: [
-          `VID:0x${
-            props.modelValue.vendorId['toString'](16).toUpperCase().padStart(4, '0')
-          }`,
-          `PID:0x${
-            props.modelValue.productId['toString'](16).toUpperCase().padStart(4, '0')
-          }`
-        ],
-      };
+    const deviceForest = computed(() => {
+      let rootForest = [];
+      let deviceIndex = 0;
+      props.modelValue.forEach(device => {
+        let rootTree = {
+          id: `root_${deviceIndex}`,
+          header: 'img',
+          label: device.productName ? device.productName : 'Anonymous',
+          avatar: device.icon,
+          side: [
+            `VID:0x${
+              device.vendorId['toString'](16).toUpperCase().padStart(4, '0')
+            }`,
+            `PID:0x${
+              device.productId['toString'](16).toUpperCase().padStart(4, '0')
+            }`
+          ],
+        };
 
-      if (props.modelValue["collections"].length) {
-        let collections = [];
-        let collectionIndex = 0;
-        props.modelValue["collections"].forEach(collection => {
-          let collectionTree = {
-            id: `collection_${collectionIndex}`,
-            header: 'icon',
-            label: `collection ${collectionIndex}`,
-            icon: 'mdi-video-input-component',
-            children: parseReports(
-              collectionIndex,
-              collection
-            )
-          }
-          collections.push(collectionTree);
-          collectionIndex++;
-        });
-        rootTree.children = collections;
-      }
-      return rootTree;
+        if (device["collections"].length) {
+          let collections = [];
+          let collectionIndex = 0;
+          device["collections"].forEach(collection => {
+            let collectionTree = {
+              id: `root_${deviceIndex}.collection_${collectionIndex}`,
+              header: 'icon',
+              label: `collection ${collectionIndex}`,
+              icon: 'mdi-video-input-component',
+              children: parseReports(
+                `root_${deviceIndex}.collection_${collectionIndex}`,
+                collection
+              )
+            }
+            collections.push(collectionTree);
+            collectionIndex++;
+          });
+          rootTree.children = collections;
+        }
+        rootForest.push(rootTree);
+        deviceIndex++;
+      });
+      return rootForest;
     });
-    const expanded = ref(['root']);
-    if (props.modelValue && deviceTree.value.hasOwnProperty('children')) {
-      deviceTree.value.children.forEach(collection => {
-        if (collection.hasOwnProperty('children')) {
-          expanded.value.push(collection.id);
+    const expanded = ref([]);
+    if (deviceForest.value.length) {
+      deviceForest.value.forEach(device => {
+        expanded.value.push(device.id);
+        if (device.hasOwnProperty('children')) {
+          device.children.forEach(collection => {
+            if (collection.hasOwnProperty('children')) {
+              expanded.value.push(collection.id);
+            }
+          });
         }
       });
     }
     return {
-      deviceTree,
+      deviceForest,
       expanded
     }
   },

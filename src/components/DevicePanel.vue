@@ -2,13 +2,13 @@
   <q-card>
     <q-dialog
       v-model="isQuerying"
-      @hide="queriedDevice = null"
+      @hide="queriedDevices = null"
       style="min-width: 50vw">
       <q-card class="hide-scrollbar full-width">
         <q-card-section>
           <div class="text-h6">Device info</div>
         </q-card-section>
-        <HidDeviceTree v-model="queriedDevice"/>
+        <HidDeviceForest v-model="queriedDevices"/>
         <q-card-actions align="right">
           <q-btn flat label="Dismiss" color="primary" v-close-popup/>
         </q-card-actions>
@@ -16,14 +16,14 @@
     </q-dialog>
     <q-dialog
       v-model="isChecking"
-      @hide="queriedDevice = null"
+      @hide="queriedDevices = null"
       persistent
       style="min-width: 50vw">
       <q-card class="hide-scrollbar full-width">
         <q-card-section>
-          <div class="text-h6">Check the device</div>
+          <div class="text-h6">Check the devices</div>
         </q-card-section>
-        <HidDeviceTree v-model="queriedDevice"/>
+        <HidDeviceForest v-model="queriedDevices"/>
         <q-card-actions align="right">
           <q-btn flat label="Cancel" @click="checkResult=false" v-close-popup/>
           <q-btn flat label="Connect" color="primary" @click="checkResult=true" v-close-popup/>
@@ -169,12 +169,12 @@ import {defineComponent, ref, watch} from 'vue'
 
 import {HidDevice} from "boot/hid";
 import {VendorIcons} from "src/scripts/vendorIcons";
-import HidDeviceTree from "components/HidDeviceTree";
+import HidDeviceForest from "components/HidDeviceForest";
 import {sleep} from "src/scripts/utils";
 
 export default defineComponent({
   name: 'DevicePanel',
-  components: {HidDeviceTree},
+  components: {HidDeviceForest},
   data() {
     return {
       scanInterval: null,
@@ -186,7 +186,7 @@ export default defineComponent({
       isQuerying: ref(false),
       isChecking: ref(false),
       checkResult: null,
-      queriedDevice: null,
+      queriedDevices: null,
       selectedDevice: null,
       connectedDevice: null,
     }
@@ -222,7 +222,7 @@ export default defineComponent({
     },
     queryDevice(device) {
       if (device) {
-        this.queriedDevice = device;
+        this.queriedDevices = [device];
         this.isQuerying = true;
       }
     },
@@ -275,7 +275,7 @@ export default defineComponent({
       navigator["hid"]["requestDevice"]({filters: []}).then(async devices => {
         if (devices.length !== 0) {
           console.log(devices);
-          this.queriedDevice = devices[0];
+          this.queriedDevices = devices;
           this.isChecking = true;
           while (this.checkResult === null) {
             await sleep(100);

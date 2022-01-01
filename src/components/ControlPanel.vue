@@ -242,6 +242,7 @@ export default defineComponent({
       } else {
         this.selectedReport = null;
         this.enablePanel = false;
+        this.savedReportsOpen = false;
       }
     });
   },
@@ -287,7 +288,16 @@ export default defineComponent({
       HidDevice.sendReport(this.selectedReport.id, hexToBuffer(this.dataPacks.join('')));
     },
     clearDataPacks() {
-      this.dataPacks = new Array(this.dataPacks.length).fill(new Uint8Array(16).join(''));
+      let newPacks = new Array(this.dataPacks.length);
+      for (let index = 0; index < this.dataPacks.length; index++) {
+        newPacks[index] = new Array(this.dataPacks[index].length).fill('0').join('');
+      }
+      this.dataPacks = newPacks;
+      this.$q.notify({
+        type: 'info',
+        message: this.i18n('notifications.clearData'),
+        icon: 'mdi-numeric-0-box-multiple-outline'
+      });
     },
     useHistory(history) {
       let found = false;
@@ -326,34 +336,39 @@ export default defineComponent({
         productId: HidDevice.device['productId'],
         reportId: this.selectedReport.id,
         reportUsages: this.selectedReport.usages,
-        data: this.dataPacks,
+        data: this.dataPacks.join(' ').split(' ')
       };
       this.savedReports.push(saved);
       this.$q.localStorage.set(
         `savedReports_${HidDevice.device['vendorId']}_${HidDevice.device['productId']}`,
         this.savedReports
       );
+      this.$q.notify({
+        type: 'positive',
+        message: this.i18n('notifications.saveSuccess'),
+        icon: 'mdi-archive-arrow-down-outline'
+      });
     },
     loadReport(loaded) {
       let found = false;
       this.reportList.forEach(report => {
         if (report.id === loaded.reportId) {
           this.selectedReport = report;
-          this.dataPacks = loaded.data;
+          this.dataPacks = loaded.data.join(' ').split(' ');
           found = true;
         }
       });
       if (!found) {
         this.$q.notify({
           type: 'warning',
-          message: this.i18n('notifications.invalidSave'),
-          icon: 'mdi-message-alert-outline'
+          message: this.i18n('notifications.loadFailed'),
+          icon: 'mdi-archive-remove-outline'
         });
       } else {
         this.$q.notify({
           type: 'positive',
-          message: this.i18n('notifications.validSave'),
-          icon: 'mdi-comment-check-outline'
+          message: this.i18n('notifications.loadSuccess'),
+          icon: 'mdi-archive-arrow-up-outline'
         });
       }
     },
@@ -363,6 +378,11 @@ export default defineComponent({
         `savedReports_${HidDevice.device['vendorId']}_${HidDevice.device['productId']}`,
         this.savedReports
       );
+      this.$q.notify({
+        type: 'info',
+        message: this.i18n('notifications.deleteSuccess'),
+        icon: 'mdi-archive-minus-outline'
+      });
     },
     i18n(relativePath) {
       return this.$t('components.controlPanel.' + relativePath);

@@ -34,7 +34,6 @@ function messagePacker(id, buffer) {
 
 const HidDevice = reactive({
   device: ref(null),
-
   sentMessage: ref(null),
   receivedMessage: ref(null),
 
@@ -48,6 +47,12 @@ const HidDevice = reactive({
       });
       this.device["addEventListener"]("inputreport", (e) => {
         this.receivedMessage = messagePacker(e["reportId"], e.data.buffer);
+      });
+    }).catch((err) => {
+      Notify.create({
+        type: 'negative',
+        message: err.message,
+        icon: 'report_off'
       });
     });
   },
