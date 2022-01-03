@@ -50,7 +50,7 @@ import {computed, defineComponent, ref} from 'vue'
 export default defineComponent({
   name: 'HidDeviceForest',
   props: {
-    modelValue: {
+    devices: {
       type: Array,
       default: () => [],
     },
@@ -143,7 +143,7 @@ export default defineComponent({
     const deviceForest = computed(() => {
       let rootForest = [];
       let deviceIndex = 0;
-      props.modelValue.forEach(device => {
+      props.devices.forEach(device => {
         let rootTree = {
           id: `root_${deviceIndex}`,
           header: 'img',

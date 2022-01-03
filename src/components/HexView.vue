@@ -1,14 +1,10 @@
 <template>
   <q-card class="column">
     <q-toolbar :class="[`bg-${colorScheme}`,`text-white`]">
-      <q-toolbar-title>
+      <q-icon :name="icon" size="md"/>
+      <q-toolbar-title class="gt-xs">
         {{ label }}
       </q-toolbar-title>
-      <div
-        class="text-body1 text-weight-light text-italic"
-        v-show="!dataList.length">
-        {{ noDataLabel }}
-      </div>
       <q-space/>
       <q-toggle
         checked-icon="mdi-arrow-collapse-down"
@@ -88,13 +84,13 @@ export default defineComponent({
       default: () => {
       },
     },
+    icon: {
+      type: String,
+      default: 'subject',
+    },
     label: {
       type: String,
       default: '',
-    },
-    noDataLabel: {
-      type: String,
-      default: () => 'Nothing here'
     },
     colorScheme: {
       type: String,

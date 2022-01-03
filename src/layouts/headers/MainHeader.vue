@@ -15,6 +15,9 @@
         NebulaE
       </q-toolbar-title>
       <q-space/>
+      <q-btn dense flat icon="settings">
+        <SettingsMenu/>
+      </q-btn>
       <div v-if="$q.platform.is.electron" class="row q-gutter-x-sm">
         <q-btn dense flat icon="minimize" @click="minimize"/>
         <q-btn dense flat icon="crop_square" @click="toggleMaximize"/>
@@ -26,9 +29,11 @@
 
 <script>
 import {defineComponent} from 'vue'
+import SettingsMenu from "components/SettingsMenu";
 
 export default defineComponent({
   name: "MainHeader",
+  components: {SettingsMenu},
   setup() {
     function minimize() {
       if (process.env.MODE === 'electron') {
@@ -53,9 +58,6 @@ export default defineComponent({
   methods: {
     i18n(relativePath) {
       return this.$t('layouts.headers.main.' + relativePath);
-    },
-    log(e) {
-      console.log(e);
     }
   },
 })

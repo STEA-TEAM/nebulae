@@ -1,26 +1,31 @@
 <template>
-  <q-page class="flex fullscreen q-pt-xl" style="z-index: 0">
-    <div class="full-width justify-between column q-pa-lg q-gutter-y-sm">
-      <div class="col-grow column q-gutter-y-sm">
-        <HexView
-          class="col-grow"
-          v-model="sentMessage"
-          label="Sent Data"
-          no-data-label="No send data"
-          color-scheme="green"
-          @data:history="$refs.control.useHistory($event)"/>
-        <HexView
-          class="col-grow"
-          v-model="receivedMessage"
-          label="Received Data"
-          no-data-label="No receive data"
-          color-scheme="blue"
-          @data:history="$refs.control.useHistory($event)"/>
-      </div>
-      <div class="col-auto row justify-between q-gutter-x-sm">
-        <DevicePanel class="col-2"/>
-        <ControlPanel ref="control" class="col-grow"/>
-      </div>
+  <q-page
+    class="flex full-width full-height q-pa-md"
+    :class="pageClass">
+    <div
+      class="col-grow column q-gutter-y-sm">
+      <HexView
+        class="col-grow"
+        color-scheme="green"
+        icon="mdi-export"
+        label="Sent Data"
+        v-model="sentMessage"
+        @data:history="$refs.control.useHistory($event)"
+        style="min-height: 30vh"/>
+      <HexView
+        class="col-grow"
+        color-scheme="blue"
+        icon="mdi-import"
+        label="Received Data"
+        v-model="receivedMessage"
+        @data:history="$refs.control.useHistory($event)"
+        style="min-height: 30vh"/>
+    </div>
+    <div
+      class="col-lg-3 col-xl-2"
+      :class="functionAreaClass">
+      <DevicePanel class="col-12 col-sm-4 col-md-3 col-lg-2"/>
+      <ControlPanel class="col-grow"/>
     </div>
   </q-page>
 </template>
@@ -44,8 +49,22 @@ export default defineComponent({
   created() {
     watch(() => HidDevice.sentMessage, (value) => this.sentMessage = value);
     watch(() => HidDevice.receivedMessage, (value) => this.receivedMessage = value);
+    watch(() => this.$q.screen.name, (value) => console.log(value));
   },
-  methods: {}
+  computed: {
+    pageClass() {
+      if (this.$q.screen.lt.lg) {
+        return ['column', 'q-gutter-y-sm'];
+      }
+      return ['row', 'q-gutter-x-sm'];
+    },
+    functionAreaClass() {
+      if (this.$q.screen.gt.xs && this.$q.screen.lt.lg) {
+        return ['row', 'q-gutter-x-sm'];
+      }
+      return ['column', 'q-gutter-y-sm'];
+    },
+  }
 })
 </script>
 

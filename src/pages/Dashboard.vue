@@ -8,7 +8,7 @@
       NebulaE
     </div>
     <div class="text-h5 text-grey-7">
-      A Quasar Framework Hardware Debugging Toolset
+      A Quasar framework hardware debugging toolset
     </div>
   </q-page>
 </template>

@@ -1,7 +1,7 @@
 {
   "name": "nebulae",
   "version": "0.0.1",
-  "description": "A Quasar Framework multi-purpose debugging toolset",
+  "description": "A Quasar framework hardware debugging toolset",
   "productName": "NebulaE",
   "author": "ParticleG <particle_g@outlook.com>",
   "private": true,

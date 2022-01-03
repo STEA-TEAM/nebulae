@@ -1,175 +1,114 @@
 <template>
   <q-card>
-    <q-dialog
-      v-model="savedReportsOpen"
-      position="right"
-      seamless
-      style="min-width: 50vw">
-      <q-card class="hide-scrollbar full-width">
-        <q-card-section>
-          <div class="text-h6">Saved Reports</div>
-        </q-card-section>
-        <q-separator/>
-        <q-list separator>
-          <q-item v-if="!savedReports.length">
-            <q-item-section>
-              <q-item-label class="text-italic text-grey">
-                No saved reports
-              </q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-item
-            v-for="(report,index) in savedReports"
-            :key="index"
-            clickable
-            @click="loadReport(report)">
-            <q-item-section avatar>
-              <q-btn
-                color="negative"
-                dense
-                flat
-                icon="delete"
-                @click.stop.prevent="deleteReport(index)">
-              </q-btn>
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>
-                {{ report.name ? report.name : 'Nameless Report' }}
-              </q-item-label>
-              <q-item-label caption>
-                VID: {{
-                  report.vendorId ? report.vendorId["toString"](16).toUpperCase().padStart(4, '0') : 'Unknown'
-                }}
-                &emsp;
-                PID: {{
-                  report.productId ? report.productId["toString"](16).toUpperCase().padStart(4, '0') : 'Unknown'
-                }}
-              </q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-chip>
-                <q-avatar color="primary" text-color="white">
-                  {{ report.reportId }}
-                </q-avatar>
-                reportID
-              </q-chip>
-              <q-item-label>
-              </q-item-label>
-            </q-item-section>
-            <q-tooltip
-              :delay="250"
-              anchor="center left"
-              max-width="19ch"
-              self="center right"
-              transition-hide="jump-right"
-              transition-show="jump-left">
-              <div class="text-weight-bold">
-                {{ `Data pack:` }}
-              </div>
-              <div>
-                {{ report.data.join('\n') }}
-              </div>
-            </q-tooltip>
-          </q-item>
-        </q-list>
-        <q-separator/>
-        <q-card-actions align="stretch">
-          <q-btn class="full-width" flat icon-right="last_page" v-close-popup>
-            Dismiss
-          </q-btn>
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-    <q-card-section class="full-width row q-gutter-x-md">
-      <q-chip
-        :disable="!enablePanel">
-        <q-avatar color="primary" text-color="white">
-          {{ selectedReport ? selectedReport.bytes : '?' }}
-        </q-avatar>
-        Report Bytes
-      </q-chip>
-      <q-select
-        clearable
-        color="primary"
-        dense
-        :disable="!enablePanel"
-        :display-value="selectedReport ? `${selectedReport.id}` : null"
-        dropdown-icon="expand_less"
-        label="Select Report ID"
-        menu-anchor="top left"
-        menu-self="bottom left"
-        options-dense
-        options-selected-class="text-primary"
-        outlined
-        :options="reportList"
-        :model-value="selectedReport"
-        @update:modelValue="selectedReport = $event"
-        style="min-width: 180px">
-        <template v-slot:option="item">
-          <q-item v-bind="item['itemProps']" dense>
-            <q-item-section>
-              <q-item-label>
-                {{ item['opt'].id }}
-              </q-item-label>
-            </q-item-section>
-            <q-item-section side>
-              <q-item-label caption>
-                {{ item['opt'].bytes }} Bytes
-              </q-item-label>
-            </q-item-section>
-          </q-item>
-        </template>
-        <template v-slot:no-option>
-          <q-item>
-            <q-item-section class="text-italic text-grey">
-              No output report available
-            </q-item-section>
-          </q-item>
-        </template>
-      </q-select>
-      <q-btn
-        color="primary"
-        dense
-        :disable="!enablePanel || !selectedReport"
-        unelevated
-        icon-right="send"
-        label="Send Report"
-        @click="sendReport"/>
-      <q-btn
-        color="negative"
-        dense
-        icon-right="delete_sweep"
-        label="Clear Report"
-        unelevated
-        @click="clearDataPacks"/>
+    <q-card-section
+      class="full-width"
+      :class="actionSectionClass">
+      <div :class="actionPairClass">
+        <q-chip
+          :dense="$q.screen.lt.sm"
+          :disable="!enablePanel || !selectedReport">
+          <q-avatar color="primary" text-color="white">
+            {{ selectedReport ? selectedReport.bytes : '?' }}
+          </q-avatar>
+          Bytes
+        </q-chip>
+        <q-select
+          class="col-grow"
+          clearable
+          color="primary"
+          dense
+          :disable="!enablePanel"
+          :display-value="selectedReport ? `${selectedReport.id}` : null"
+          dropdown-icon="expand_less"
+          :label="$q.screen.gt.xs
+                    ?i18n('selects.report')
+                    :i18n('selects.reportShort')"
+          :menu-anchor="vertical?'top left':''"
+          :menu-self="vertical?'bottom left':''"
+          options-dense
+          options-selected-class="text-primary"
+          outlined
+          :options="reportList"
+          :model-value="selectedReport"
+          @update:modelValue="selectedReport = $event"
+          :style="{minWidth: $q.screen.gt.xs?'20ch':'10ch'}">
+          <template v-slot:option="item">
+            <q-item v-bind="item['itemProps']" dense>
+              <q-item-section>
+                <q-item-label>
+                  {{ item['opt'].id }}
+                </q-item-label>
+              </q-item-section>
+              <q-item-section side>
+                <q-item-label caption>
+                  {{ item['opt'].bytes }} Bytes
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+          </template>
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section class="text-italic text-grey">
+                No output report available
+              </q-item-section>
+            </q-item>
+          </template>
+        </q-select>
+      </div>
+      <div :class="actionPairClass">
+        <q-btn
+          color="primary"
+          dense
+          :disable="!enablePanel || !selectedReport"
+          unelevated
+          icon-right="send"
+          :label="$q.screen.gt.xs
+                    ?i18n('buttons.send')
+                    :i18n('buttons.sendShort')"
+          @click="sendReport"/>
+        <q-btn
+          color="negative"
+          dense
+          :disable="!enablePanel || !selectedReport"
+          icon-right="delete_sweep"
+          :label="$q.screen.gt.xs
+                    ?i18n('buttons.clear')
+                    :i18n('buttons.clearShort')"
+          unelevated
+          @click="clearDataPacks"/>
+      </div>
       <q-space/>
-      <q-input
-        clearable
-        dense
-        :disable="!enablePanel || !selectedReport"
-        label="Save this report"
-        :maxlength="32"
-        outlined
-        :model-value="saveName"
-        @update:modelValue="saveName=$event">
-        <template v-slot:after>
-          <q-btn
-            dense
-            :disable="!enablePanel || !selectedReport"
-            flat
-            icon="mdi-content-save"
-            round
-            @click="saveReport"/>
-        </template>
-      </q-input>
-      <q-btn
-        color="accent"
-        dense
-        :disable="!enablePanel || !selectedReport"
-        unelevated
-        icon-right="mdi-book-alphabet"
-        label="Saved reports"
-        @click="savedReportsOpen=!savedReportsOpen"/>
+      <div :class="actionPairClass">
+        <q-input
+          class="col-grow"
+          clearable
+          dense
+          :disable="!enablePanel || !selectedReport"
+          label="Save this report"
+          :maxlength="32"
+          outlined
+          :model-value="saveName"
+          @update:modelValue="saveName=$event">
+          <template v-slot:before>
+            <q-btn
+              color="accent"
+              :disable="!enablePanel || !selectedReport"
+              icon="book"
+              outline
+              padding="sm"
+              @click="openDialog"/>
+          </template>
+          <template v-slot:after>
+            <q-btn
+              color="primary"
+              :disable="!enablePanel || !selectedReport"
+              icon="save"
+              outline
+              padding="sm"
+              @click="saveReport"/>
+          </template>
+        </q-input>
+      </div>
       <div/>
     </q-card-section>
     <q-card-section class="full-width row items-start justify-between">
@@ -195,6 +134,7 @@ import {HidDevice} from "boot/hid";
 import {hexToBuffer} from "src/scripts/utils";
 
 import HexInput from "components/HexInput";
+import ListDialog from "components/ListDialog";
 
 export default defineComponent({
   name: 'ControlPanel',
@@ -208,7 +148,7 @@ export default defineComponent({
       dataPacks: new Array(8).fill(new Uint8Array(16).join('')),
       saveName: null,
       savedReports: [],
-      savedReportsOpen: false,
+      dialogOpen: false,
     }
   },
   created() {
@@ -227,14 +167,13 @@ export default defineComponent({
             })
           }
         });
-        console.log(reportList);
         this.reportList = reportList;
         if (reportList[0]) {
           this.selectedReport = reportList[0];
         }
 
         let savedReports = this.$q.localStorage.getItem(
-          `savedReports_${value['vendorId']}_${value['productId']}`
+          `data.savedReports.${value['vendorId']}_${value['productId']}`
         );
         if (savedReports) {
           this.savedReports = savedReports;
@@ -242,9 +181,26 @@ export default defineComponent({
       } else {
         this.selectedReport = null;
         this.enablePanel = false;
-        this.savedReportsOpen = false;
+        this.dialogOpen = false;
       }
     });
+  },
+  computed: {
+    vertical() {
+      return this.$q.screen.gt.sm && this.$q.screen.lt.lg;
+    },
+    actionSectionClass() {
+      if (this.$q.screen.gt.sm && this.$q.screen.lt.lg) {
+        return ['row', 'items-center', 'q-gutter-x-sm'];
+      }
+      return ['column', 'justify-end', 'q-gutter-y-sm'];
+    },
+    actionPairClass() {
+      if (this.$q.screen.gt.sm && this.$q.screen.lt.lg) {
+        return ['column', 'justify-between', 'q-gutter-y-sm'];
+      }
+      return ['row', 'items-center', 'justify-end', 'q-gutter-x-sm'];
+    }
   },
   watch: {
     selectedReport(value) {
@@ -328,25 +284,67 @@ export default defineComponent({
         });
       }
     },
+    openDialog() {
+      if (!this.dialogOpen) {
+        this.dialogOpen = true;
+        this.$q.dialog({
+          component: ListDialog,
+          componentProps: {
+            list: this.savedReports,
+            position: this.$q.screen.lt.lg ? "right" : "top",
+
+            title: this.i18n('dialog.title'),
+            noItemText: this.i18n('dialog.noItemText'),
+            dismissText: this.i18n('dialog.dismissText'),
+            chipText: this.i18n('dialog.chipText'),
+            tooltipTitle: this.i18n('dialog.tooltipTitle'),
+
+            tooltipWidth: "19ch",
+
+            chipNumberKey: "reportId",
+
+            selectCallback: this.loadReport,
+            removeCallback: this.deleteReport,
+          }
+        }).onDismiss(() => {
+          this.dialogOpen = false;
+        });
+      }
+    },
     saveReport() {
       let saved = {
-        name: this.saveName,
-        deviceName: HidDevice.device['productName'],
-        vendorId: HidDevice.device['vendorId'],
-        productId: HidDevice.device['productId'],
+        label: this.saveName,
+        caption: `VID: 0x${
+          HidDevice.device['vendorId'].toString(16).toUpperCase().padStart(4, '0')
+        } PID: 0x${
+          HidDevice.device['productId'].toString(16).toUpperCase().padStart(4, '0')
+        }`,
+        tooltip: this.dataPacks.join('\n'),
+
         reportId: this.selectedReport.id,
-        reportUsages: this.selectedReport.usages,
-        data: this.dataPacks.join(' ').split(' ')
+        data: this.dataPacks.join(' ').split(' '),
       };
       this.savedReports.push(saved);
       this.$q.localStorage.set(
-        `savedReports_${HidDevice.device['vendorId']}_${HidDevice.device['productId']}`,
+        `data.savedReports.${HidDevice.device['vendorId']}_${HidDevice.device['productId']}`,
         this.savedReports
       );
       this.$q.notify({
         type: 'positive',
         message: this.i18n('notifications.saveSuccess'),
         icon: 'mdi-archive-arrow-down-outline'
+      });
+    },
+    deleteReport(index) {
+      this.savedReports.splice(index, 1);
+      this.$q.localStorage.set(
+        `data.savedReports.${HidDevice.device['vendorId']}_${HidDevice.device['productId']}`,
+        this.savedReports
+      );
+      this.$q.notify({
+        type: 'info',
+        message: this.i18n('notifications.deleteSuccess'),
+        icon: 'mdi-archive-minus-outline'
       });
     },
     loadReport(loaded) {
@@ -371,18 +369,6 @@ export default defineComponent({
           icon: 'mdi-archive-arrow-up-outline'
         });
       }
-    },
-    deleteReport(index) {
-      this.savedReports.splice(index, 1);
-      this.$q.localStorage.set(
-        `savedReports_${HidDevice.device['vendorId']}_${HidDevice.device['productId']}`,
-        this.savedReports
-      );
-      this.$q.notify({
-        type: 'info',
-        message: this.i18n('notifications.deleteSuccess'),
-        icon: 'mdi-archive-minus-outline'
-      });
     },
     i18n(relativePath) {
       return this.$t('components.controlPanel.' + relativePath);

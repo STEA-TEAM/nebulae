@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import {computed, defineComponent, watch} from 'vue'
+import {computed, defineComponent} from 'vue'
 
 export default defineComponent({
   name: 'HexInput',

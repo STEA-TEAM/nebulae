@@ -1,35 +1,5 @@
 <template>
   <q-card>
-    <q-dialog
-      v-model="isQuerying"
-      @hide="queriedDevices = null"
-      style="min-width: 50vw">
-      <q-card class="hide-scrollbar full-width">
-        <q-card-section>
-          <div class="text-h6">Device info</div>
-        </q-card-section>
-        <HidDeviceForest v-model="queriedDevices"/>
-        <q-card-actions align="right">
-          <q-btn flat label="Dismiss" color="primary" v-close-popup/>
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-    <q-dialog
-      v-model="isChecking"
-      @hide="queriedDevices = null"
-      persistent
-      style="min-width: 50vw">
-      <q-card class="hide-scrollbar full-width">
-        <q-card-section>
-          <div class="text-h6">Check the devices</div>
-        </q-card-section>
-        <HidDeviceForest v-model="queriedDevices"/>
-        <q-card-actions align="right">
-          <q-btn flat label="Cancel" @click="checkResult=false" v-close-popup/>
-          <q-btn flat label="Connect" color="primary" @click="checkResult=true" v-close-popup/>
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
     <q-card-section class="full-width column q-gutter-y-sm">
       <div class="col-auto row">
         <q-input
@@ -165,16 +135,16 @@
 </template>
 
 <script>
-import {defineComponent, ref, watch} from 'vue'
+import {defineComponent, watch} from 'vue'
+
+import ForestDialog from "components/ForestDialog";
 
 import {HidDevice} from "boot/hid";
 import {VendorIcons} from "src/scripts/vendorIcons";
-import HidDeviceForest from "components/HidDeviceForest";
 import {sleep} from "src/scripts/utils";
 
 export default defineComponent({
   name: 'DevicePanel',
-  components: {HidDeviceForest},
   data() {
     return {
       scanInterval: null,
@@ -183,10 +153,7 @@ export default defineComponent({
         vendorId: '',
         productId: '',
       },
-      isQuerying: ref(false),
-      isChecking: ref(false),
-      checkResult: null,
-      queriedDevices: null,
+      dialogOpen: false,
       selectedDevice: null,
       connectedDevice: null,
     }
@@ -221,9 +188,19 @@ export default defineComponent({
       });
     },
     queryDevice(device) {
-      if (device) {
-        this.queriedDevices = [device];
-        this.isQuerying = true;
+      if (device && !this.dialogOpen) {
+        this.dialogOpen = true;
+        this.$q.dialog({
+          component: ForestDialog,
+          componentProps: {
+            forest: [device],
+
+            title: this.i18n('infoDialog.title'),
+            cancelText: this.i18n('infoDialog.cancelText'),
+          }
+        }).onDismiss(() =>
+          this.dialogOpen = false
+        );
       }
     },
     hexRule(value) {
@@ -275,12 +252,26 @@ export default defineComponent({
       navigator["hid"]["requestDevice"]({filters: []}).then(async devices => {
         if (devices.length !== 0) {
           console.log(devices);
-          this.queriedDevices = devices;
-          this.isChecking = true;
-          while (this.checkResult === null) {
+          let checkResult = null;
+          this.dialogOpen = true;
+          this.$q.dialog({
+            component: ForestDialog,
+            componentProps: {
+              forest: devices,
+
+              title: this.i18n('checkDialog.title'),
+              confirmText: this.i18n('checkDialog.confirmText'),
+              cancelText: this.i18n('checkDialog.cancelText'),
+
+              prompt: true,
+              cancelCallback: () => checkResult = false,
+              confirmCallback: () => checkResult = true,
+            }
+          }).onDismiss(() => this.dialogOpen = false);
+          while (checkResult === null) {
             await sleep(100);
           }
-          if (this.checkResult) {
+          if (checkResult) {
             HidDevice.connect(devices[0]);
           }
           this.checkResult = null;

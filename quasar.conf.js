@@ -86,7 +86,9 @@ module.exports = configure(function (ctx) {
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
     framework: {
-      config: {},
+      config: {
+        dark: 'auto'
+      },
 
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack
@@ -151,7 +153,7 @@ module.exports = configure(function (ctx) {
       manifest: {
         name: `NebulaE`,
         short_name: `NebulaE`,
-        description: `A Quasar Framework multi-purpose debugging toolset`,
+        description: `A Quasar framework hardware debugging toolset`,
         display: 'standalone',
         orientation: 'portrait',
         background_color: '#ffffff',
