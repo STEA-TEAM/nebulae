@@ -204,8 +204,7 @@ module.exports = configure(function (ctx) {
 
       packager: {
         // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
-        all: true,
-        platform: ['darwin', 'linux', 'win32']
+        platform: ['linux', 'win32']
       },
 
       builder: {
