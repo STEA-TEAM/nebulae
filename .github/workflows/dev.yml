@@ -1,0 +1,44 @@
+name: Quasar Develop
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-spa:
+#    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+
+      - name: Install packages
+        run: |
+          npm install -g @quasar/cli
+          npm install
+
+      - name: Build the app for development
+        run: |
+          quasar mode add electron
+          quasar build -m electron
+
+#      - name: Upload artifact
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: Nebula_SPA
+#          path: dist/spa
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Nebula_SPA
+          path: dist/electron
