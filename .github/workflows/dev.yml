@@ -24,7 +24,7 @@ jobs:
 
       - name: Build the app for production
         run: |
-          quasar build
+          npm run quasar build
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
