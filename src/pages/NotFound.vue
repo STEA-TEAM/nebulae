@@ -2,11 +2,11 @@
   <div class="fullscreen bg-blue text-white text-center q-pa-md flex flex-center">
     <div>
       <div style="font-size: 30vh">
-        404
+        {{ i18n('labels.title') }}
       </div>
 
       <div class="text-h2" style="opacity:.4">
-        Oops. Nothing here...
+        {{ i18n('labels.intro') }}
       </div>
 
       <q-btn
@@ -15,7 +15,7 @@
         text-color="blue"
         unelevated
         to="/"
-        label="Go Home"
+        :label="i18n('labels.return')"
         no-caps
       />
     </div>
@@ -26,6 +26,11 @@
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'Error404'
+  name: 'NotFound',
+  methods: {
+    i18n(relativePath) {
+      return this.$t('pages.notFound.' + relativePath);
+    },
+  }
 })
 </script>

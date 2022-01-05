@@ -1,22 +1,7 @@
-import {Notify} from 'quasar'
+import {boot} from 'quasar/wrappers'
 import {reactive, ref} from "vue";
+import {Notify} from 'quasar'
 import {charArrToHex} from "src/scripts/utils";
-
-navigator["hid"].addEventListener("connect", () => {
-  Notify.create({
-    type: 'positive',
-    message: 'Device connected',
-    icon: 'link'
-  });
-});
-
-navigator["hid"].addEventListener("disconnect", () => {
-  Notify.create({
-    type: 'warning',
-    message: 'Device disconnected',
-    icon: 'report_off'
-  });
-});
 
 function messagePacker(id, buffer) {
   let message = {
@@ -81,4 +66,6 @@ const HidDevice = reactive({
   },
 })
 
-export {HidDevice};
+export default boot(({app}) => {
+  app.config.globalProperties.$hid = HidDevice;
+});

@@ -2,7 +2,7 @@
   <q-footer class="bg-white text-grey">
     <q-toolbar>
       <q-toolbar-title>
-        <div>Title</div>
+        <div>{{ i18n('labels.title') }}</div>
       </q-toolbar-title>
     </q-toolbar>
   </q-footer>

@@ -73,8 +73,7 @@
 </template>
 
 <script>
-import {defineComponent, watch} from 'vue'
-import {HidDevice} from "boot/hid";
+import {defineComponent} from 'vue'
 
 export default defineComponent({
   name: 'HexView',

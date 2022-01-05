@@ -15,7 +15,7 @@
               :color="menuItem.available?'primary':'grey'"/>
           </q-item-section>
           <q-item-section :class="menuItem.available?'':'text-grey'">
-            {{ i18n('menuLabels.' + menuItem.label) }}
+            {{ i18n('labels.' + menuItem.label) }}
           </q-item-section>
         </q-item>
         <q-separator v-if="menuItem.separator"/>

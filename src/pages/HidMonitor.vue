@@ -8,24 +8,24 @@
         class="col-grow"
         color-scheme="green"
         icon="mdi-export"
-        label="Sent Data"
+        :label="i18n('labels.sentArea')"
         v-model="sentMessage"
         @data:history="$refs.control.useHistory($event)"
-        style="min-height: 30vh"/>
+        style="min-height: 40ch"/>
       <HexView
         class="col-grow"
         color-scheme="blue"
         icon="mdi-import"
-        label="Received Data"
+        :label="i18n('labels.receivedArea')"
         v-model="receivedMessage"
         @data:history="$refs.control.useHistory($event)"
-        style="min-height: 30vh"/>
+        style="min-height: 40ch"/>
     </div>
     <div
       class="col-lg-3 col-xl-2"
       :class="functionAreaClass">
-      <DevicePanel class="col-12 col-sm-4 col-md-3 col-lg-2"/>
-      <ControlPanel class="col-grow"/>
+      <DevicePanel class="col-12 col-sm-4 col-md-3 col-lg-auto"/>
+      <ControlPanel class="col-grow" ref="control"/>
     </div>
   </q-page>
 </template>
@@ -47,9 +47,9 @@ export default defineComponent({
     }
   },
   created() {
-    watch(() => HidDevice.sentMessage, (value) => this.sentMessage = value);
-    watch(() => HidDevice.receivedMessage, (value) => this.receivedMessage = value);
-    watch(() => this.$q.screen.name, (value) => console.log(value));
+    watch(() => this.$hid.sentMessage, (value) => this.sentMessage = value);
+    watch(() => this.$hid.receivedMessage, (value) => this.receivedMessage = value);
+    // watch(() => this.$q.screen.name, (value) => console.log(value));
   },
   computed: {
     pageClass() {
@@ -63,6 +63,11 @@ export default defineComponent({
         return ['row', 'q-gutter-x-sm'];
       }
       return ['column', 'q-gutter-y-sm'];
+    },
+  },
+  methods: {
+    i18n(relativePath) {
+      return this.$t('pages.hidMonitor.' + relativePath);
     },
   }
 })

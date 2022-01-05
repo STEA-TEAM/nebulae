@@ -3,11 +3,11 @@
     <q-list style="min-width: 100px">
       <q-item tag="label" v-ripple>
         <q-item-section>
-          {{ i18n('menu.darkMode') }}
+          {{ i18n('labels.darkMode') }}
         </q-item-section>
         <q-item-section avatar>
           <q-toggle
-            color="black"
+            color="primary"
             checked-icon="dark_mode"
             unchecked-icon="light_mode"
             :model-value="$q.dark.isActive"
@@ -24,13 +24,13 @@ import {defineComponent} from "vue";
 export default defineComponent({
   name: "SettingsMenu",
   methods: {
-    i18n(relativePath) {
-      return this.$t('layouts.headers.main.' + relativePath);
-    },
     toggleDarkMode() {
       this.$q.dark.toggle();
       this.$q.localStorage.set('settings.darkMode', this.$q.dark.mode);
-    }
+    },
+    i18n(relativePath) {
+      return this.$t('components.settingsMenu.' + relativePath);
+    },
   },
 })
 </script>

@@ -6,19 +6,21 @@
         dense
         round
         icon="menu"
-        aria-label="Menu"
         @click="$emit('click:leftMenu')"/>
       <q-avatar>
         <q-img src="svg/logo-white.svg" alt="logo"/>
       </q-avatar>
       <q-toolbar-title>
-        NebulaE
+        {{ i18n('labels.title') }}
       </q-toolbar-title>
       <q-space/>
-      <q-btn dense flat icon="settings">
+      <q-btn class="q-mx-sm" dense flat icon="language">
+        <LanguagesMenu/>
+      </q-btn>
+      <q-btn class="q-mx-sm" dense flat icon="settings">
         <SettingsMenu/>
       </q-btn>
-      <div v-if="$q.platform.is.electron" class="row q-gutter-x-sm">
+      <div v-if="$q.platform.is.electron" class="row q-ml-sm q-gutter-x-sm">
         <q-btn dense flat icon="minimize" @click="minimize"/>
         <q-btn dense flat icon="crop_square" @click="toggleMaximize"/>
         <q-btn dense flat icon="close" @click="closeApp"/>
@@ -30,10 +32,11 @@
 <script>
 import {defineComponent} from 'vue'
 import SettingsMenu from "components/SettingsMenu";
+import LanguagesMenu from "components/LanguagesMenu";
 
 export default defineComponent({
   name: "MainHeader",
-  components: {SettingsMenu},
+  components: {LanguagesMenu, SettingsMenu},
   setup() {
     function minimize() {
       if (process.env.MODE === 'electron') {

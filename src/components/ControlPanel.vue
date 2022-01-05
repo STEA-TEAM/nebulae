@@ -10,7 +10,7 @@
           <q-avatar color="primary" text-color="white">
             {{ selectedReport ? selectedReport.bytes : '?' }}
           </q-avatar>
-          Bytes
+          {{ i18n('selects.unit') }}
         </q-chip>
         <q-select
           class="col-grow"
@@ -20,11 +20,9 @@
           :disable="!enablePanel"
           :display-value="selectedReport ? `${selectedReport.id}` : null"
           dropdown-icon="expand_less"
-          :label="$q.screen.gt.xs
-                    ?i18n('selects.report')
-                    :i18n('selects.reportShort')"
-          :menu-anchor="vertical?'top left':''"
-          :menu-self="vertical?'bottom left':''"
+          :label="$q.screen.gt.xs?i18n('selects.report'):i18n('selects.reportShort')"
+          :menu-anchor="vertical?'top left':'bottom left'"
+          :menu-self="vertical?'bottom left':'top left'"
           options-dense
           options-selected-class="text-primary"
           outlined
@@ -41,7 +39,7 @@
               </q-item-section>
               <q-item-section side>
                 <q-item-label caption>
-                  {{ item['opt'].bytes }} Bytes
+                  {{ item['opt'].bytes + i18n('selects.unit') }}
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -49,7 +47,7 @@
           <template v-slot:no-option>
             <q-item>
               <q-item-section class="text-italic text-grey">
-                No output report available
+                {{ i18n('selects.noItem') }}
               </q-item-section>
             </q-item>
           </template>
@@ -62,18 +60,14 @@
           :disable="!enablePanel || !selectedReport"
           unelevated
           icon-right="send"
-          :label="$q.screen.gt.xs
-                    ?i18n('buttons.send')
-                    :i18n('buttons.sendShort')"
+          :label="$q.screen.gt.xs?i18n('buttons.send'):i18n('buttons.sendShort')"
           @click="sendReport"/>
         <q-btn
           color="negative"
           dense
           :disable="!enablePanel || !selectedReport"
           icon-right="delete_sweep"
-          :label="$q.screen.gt.xs
-                    ?i18n('buttons.clear')
-                    :i18n('buttons.clearShort')"
+          :label="$q.screen.gt.xs?i18n('buttons.clear'):i18n('buttons.clearShort')"
           unelevated
           @click="clearDataPacks"/>
       </div>
@@ -84,7 +78,7 @@
           clearable
           dense
           :disable="!enablePanel || !selectedReport"
-          label="Save this report"
+          :label="i18n('inputs.label')"
           :maxlength="32"
           outlined
           :model-value="saveName"
@@ -94,9 +88,14 @@
               color="accent"
               :disable="!enablePanel || !selectedReport"
               icon="book"
-              outline
+              :outline="!dialog"
+              :unelevated="dialog!==null"
               padding="sm"
-              @click="openDialog"/>
+              @click="toggleDialog">
+              <q-tooltip :delay="300">
+                {{ i18n('tooltips.openSaves') }}
+              </q-tooltip>
+            </q-btn>
           </template>
           <template v-slot:after>
             <q-btn
@@ -105,7 +104,11 @@
               icon="save"
               outline
               padding="sm"
-              @click="saveReport"/>
+              @click="saveReport">
+              <q-tooltip :delay="300">
+                {{ i18n('tooltips.saveReport') }}
+              </q-tooltip>
+            </q-btn>
           </template>
         </q-input>
       </div>
@@ -130,7 +133,6 @@
 
 <script>
 import {defineComponent, watch} from 'vue'
-import {HidDevice} from "boot/hid";
 import {hexToBuffer} from "src/scripts/utils";
 
 import HexInput from "components/HexInput";
@@ -148,11 +150,11 @@ export default defineComponent({
       dataPacks: new Array(8).fill(new Uint8Array(16).join('')),
       saveName: null,
       savedReports: [],
-      dialogOpen: false,
+      dialog: null,
     }
   },
   created() {
-    watch(() => HidDevice.device, (value) => {
+    watch(() => this.$hid.device, (value) => {
       if (value) {
         this.enablePanel = true;
         let reportList = [];
@@ -181,7 +183,7 @@ export default defineComponent({
       } else {
         this.selectedReport = null;
         this.enablePanel = false;
-        this.dialogOpen = false;
+        this.dialog = null;
       }
     });
   },
@@ -241,7 +243,7 @@ export default defineComponent({
       }
     },
     sendReport() {
-      HidDevice.sendReport(this.selectedReport.id, hexToBuffer(this.dataPacks.join('')));
+      this.$hid.sendReport(this.selectedReport.id, hexToBuffer(this.dataPacks.join('')));
     },
     clearDataPacks() {
       let newPacks = new Array(this.dataPacks.length);
@@ -284,10 +286,9 @@ export default defineComponent({
         });
       }
     },
-    openDialog() {
-      if (!this.dialogOpen) {
-        this.dialogOpen = true;
-        this.$q.dialog({
+    toggleDialog() {
+      if (!this.dialog) {
+        this.dialog = this.$q.dialog({
           component: ListDialog,
           componentProps: {
             list: this.savedReports,
@@ -307,17 +308,19 @@ export default defineComponent({
             removeCallback: this.deleteReport,
           }
         }).onDismiss(() => {
-          this.dialogOpen = false;
+          this.dialog = null;
         });
+      }else {
+        this.dialog.hide();
       }
     },
     saveReport() {
       let saved = {
         label: this.saveName,
         caption: `VID: 0x${
-          HidDevice.device['vendorId'].toString(16).toUpperCase().padStart(4, '0')
+          this.$hid.device.vendorId.toString(16).toUpperCase().padStart(4, '0')
         } PID: 0x${
-          HidDevice.device['productId'].toString(16).toUpperCase().padStart(4, '0')
+          this.$hid.device.productId.toString(16).toUpperCase().padStart(4, '0')
         }`,
         tooltip: this.dataPacks.join('\n'),
 
@@ -326,7 +329,7 @@ export default defineComponent({
       };
       this.savedReports.push(saved);
       this.$q.localStorage.set(
-        `data.savedReports.${HidDevice.device['vendorId']}_${HidDevice.device['productId']}`,
+        `data.savedReports.${this.$hid.device.vendorId}_${this.$hid.device.productId}`,
         this.savedReports
       );
       this.$q.notify({
@@ -338,7 +341,7 @@ export default defineComponent({
     deleteReport(index) {
       this.savedReports.splice(index, 1);
       this.$q.localStorage.set(
-        `data.savedReports.${HidDevice.device['vendorId']}_${HidDevice.device['productId']}`,
+        `data.savedReports.${this.$hid.device.vendorId}_${this.$hid.device.productId}`,
         this.savedReports
       );
       this.$q.notify({

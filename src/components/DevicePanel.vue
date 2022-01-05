@@ -7,7 +7,7 @@
           bottom-slots
           dense
           :disable="connectedDevice !== null"
-          label="Vendor ID"
+          :label="i18n('inputs.vendorId')"
           mask="XXXX"
           maxlength="4"
           reverse-fill-mask
@@ -16,7 +16,7 @@
           @update:modelValue="updateVendorId($event)"
           :rules="[hexRule]">
           <template v-slot:hint>
-            4-digit Hex
+            {{ i18n('inputs.hint') }}
           </template>
         </q-input>
         <q-input
@@ -24,7 +24,7 @@
           bottom-slots
           dense
           :disable="connectedDevice !== null"
-          label="Product ID"
+          :label="i18n('inputs.productId')"
           mask="XXXX"
           maxlength="4"
           reverse-fill-mask
@@ -33,7 +33,7 @@
           @update:modelValue="updateProductId($event)"
           :rules="[hexRule]">
           <template v-slot:hint>
-            4-digit Hex
+            {{ i18n('inputs.hint') }}
           </template>
         </q-input>
       </div>
@@ -44,7 +44,7 @@
         :disable="connectedDevice !== null"
         :display-value="selectedDevice ? `${selectedDevice.productName}` : null"
         dropdown-icon="expand_less"
-        label="Select Device"
+        :label="i18n('selects.device')"
         menu-anchor="top left"
         menu-self="bottom left"
         options-dense
@@ -63,26 +63,33 @@
           <q-item v-bind="item['itemProps']" dense>
             <q-item-section avatar>
               <q-avatar>
-                <img :src="item['opt'].icon" alt="vendorIcon"/>
+                <q-img
+                  loading="lazy"
+                  spinner-color="primary"
+                  :src="item['opt'].icon"/>
               </q-avatar>
             </q-item-section>
             <q-item-section>
               <q-item-label>
-                {{ item['opt'].productName ? item['opt'].productName : 'Anonymous' }}
+                {{ item['opt'].productName ? item['opt'].productName : i18n('selects.defaultName') }}
               </q-item-label>
               <q-item-label caption>
                 VID: {{
-                  item['opt'].vendorId ? item['opt'].vendorId["toString"](16).toUpperCase().padStart(4, '0') : 'Unknown'
+                  item['opt'].vendorId
+                    ? item['opt'].vendorId["toString"](16).toUpperCase().padStart(4, '0')
+                    : i18n('selects.defaultVID')
                 }}
                 &emsp;
                 PID: {{
-                  item['opt'].productId ? item['opt'].productId["toString"](16).toUpperCase().padStart(4, '0') : 'Unknown'
+                  item['opt'].productId
+                    ? item['opt'].productId["toString"](16).toUpperCase().padStart(4, '0')
+                    : i18n('selects.defaultPID')
                 }}
               </q-item-label>
             </q-item-section>
             <q-item-section side top>
               <q-item-label caption>
-                {{ item['opt']['collections'].length }} collections
+                {{ item['opt']['collections'].length + i18n('selects.unit') }}
               </q-item-label>
               <q-btn
                 color="primary"
@@ -97,7 +104,7 @@
         <template v-slot:no-option>
           <q-item>
             <q-item-section class="text-italic text-grey">
-              No device available
+              {{ i18n('selects.noItem') }}
             </q-item-section>
           </q-item>
         </template>
@@ -107,7 +114,7 @@
         v-show="!connectedDevice"
         color="positive"
         icon-right="link"
-        label="Connect"
+        :label="i18n('buttons.connect')"
         unelevated
         @click="connectHID"/>
       <q-btn
@@ -116,9 +123,8 @@
         color="red"
         unelevated
         icon-right="link"
-        label="Disconnect"
+        :label="i18n('buttons.disconnect')"
         @click="disconnectHID"/>
-
       <q-chip
         class="text-center"
         clickable
@@ -128,7 +134,7 @@
         icon="help_outline"
         outline
         @click="newHID">
-        Device not on the list?
+        {{ i18n('buttons.request') }}
       </q-chip>
     </q-card-section>
   </q-card>
@@ -139,7 +145,6 @@ import {defineComponent, watch} from 'vue'
 
 import ForestDialog from "components/ForestDialog";
 
-import {HidDevice} from "boot/hid";
 import {VendorIcons} from "src/scripts/vendorIcons";
 import {sleep} from "src/scripts/utils";
 
@@ -161,7 +166,7 @@ export default defineComponent({
   created() {
     this.refreshDevices();
     this.scanInterval = setInterval(this.refreshDevices, 3000);
-    watch(() => HidDevice.device, (value) => this.connectedDevice = value);
+    watch(() => this.$hid.device, (value) => this.connectedDevice = value);
   },
   watch: {
     selectedDevice(value) {
@@ -194,7 +199,6 @@ export default defineComponent({
           component: ForestDialog,
           componentProps: {
             forest: [device],
-
             title: this.i18n('infoDialog.title'),
             cancelText: this.i18n('infoDialog.cancelText'),
           }
@@ -211,7 +215,7 @@ export default defineComponent({
         value.search(/[G-Z]+/) === -1) {
         return true;
       }
-      return 'Invalid vendor ID';
+      return this.i18n('inputs.ruleFailed');
     },
     updateVendorId(event) {
       this.updateSelectedDevice();
@@ -236,14 +240,14 @@ export default defineComponent({
         if (this.manualInputDevice &&
           device.vendorId === parseInt(this.manualInputDevice.vendorId, 16) &&
           device.productId === parseInt(this.manualInputDevice.productId, 16)) {
-          HidDevice.connect(device);
+          this.$hid.connect(device);
           isValid = true;
         }
       });
       if (!isValid) {
         this.$q.notify({
           type: 'warning',
-          message: 'Invalid Device',
+          message: this.i18n('notifications.invalidDevice'),
           icon: 'device_unknown'
         });
       }
@@ -272,14 +276,13 @@ export default defineComponent({
             await sleep(100);
           }
           if (checkResult) {
-            HidDevice.connect(devices[0]);
+            this.$hid.connect(devices[0]);
           }
-          this.checkResult = null;
         }
       });
     },
     disconnectHID() {
-      HidDevice.disconnect();
+      this.$hid.disconnect();
     },
     i18n(relativePath) {
       return this.$t('components.devicePanel.' + relativePath);

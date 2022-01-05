@@ -201,10 +201,5 @@ export default defineComponent({
       expanded
     }
   },
-  methods: {
-    i18n(relativePath) {
-      return this.$t('components.hidDeviceTree.' + relativePath);
-    }
-  }
 })
 </script>

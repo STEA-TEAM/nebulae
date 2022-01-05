@@ -1,6 +1,3 @@
-// This is just an example,
-// so you can safely delete all default props below
-
 export default {
   components: {
     controlPanel: {
@@ -17,6 +14,9 @@ export default {
         chipText: 'Report ID',
         tooltipTitle: 'Data Packs',
       },
+      inputs: {
+        label: 'Save name',
+      },
       notifications: {
         clearData: 'Successfully cleared data packs',
         invalidHistory: 'Invalid history report: No matching report ID',
@@ -27,8 +27,14 @@ export default {
         deleteSuccess: 'Successfully deleted save',
       },
       selects: {
+        noItem: 'No output report available',
         report: 'Select Report',
         reportShort: 'Report',
+        unit: 'Bytes',
+      },
+      tooltips: {
+        openSaves: 'Open saved list',
+        saveReport: 'Save this report',
       },
     },
     devicePanel: {
@@ -36,13 +42,32 @@ export default {
         title: 'Device info',
         cancelText: 'OK',
       },
+      buttons: {
+        connect: 'Connect',
+        disconnect: 'Disconnect',
+        request: 'Device not on the list?',
+      },
       checkDialog: {
         title: 'Check devices',
         cancelText: 'Not this one',
         confirmText: 'Connect',
       },
+      inputs: {
+        vendorId: 'Vendor ID',
+        productId: 'Product ID',
+        hint: '4-digit Hex',
+        ruleFailed: 'Invalid hex number',
+      },
+      notifications: {
+        invalidDevice: 'Invalid Device',
+      },
       selects: {
         device: 'Select Device',
+        defaultName: 'Anonymous',
+        defaultVID: 'Unknown',
+        defaultPID: 'Unknown',
+        noItem: 'No device available',
+        unit: 'collections',
       },
       tooltips: {
         deviceInfo: 'Show device info',
@@ -51,32 +76,73 @@ export default {
     hexView: {
       tooltips: {
         autoScroll: 'Scroll table automatically',
-        clearData: 'Clear all data',
+        clearData: 'Clear all history',
         copyHistory: 'Click to copy report as input'
       }
     },
-    hidDeviceTree: {}
+    languagesMenu: {
+      labels: {},
+    },
+    settingsMenu: {
+      labels: {
+        darkMode: 'Dark mode',
+      },
+    }
   },
   layouts: {
     drawers: {
       main: {
-        menuLabels: {
+        labels: {
           dashboard: 'Dashboard',
-          serial: 'Serial Monitor',
-          usb: 'USB Monitor',
-          hid: 'HID Monitor',
+          serial: 'Serial Debugger',
+          usb: 'USB Debugger',
+          hid: 'HID Debugger',
         }
       }
     },
     headers: {
       main: {
-        menu: {
-          darkMode: 'Dark mode',
-        }
+        labels: {
+          title: 'NebulaE',
+        },
       }
     },
     footers: {
-      main: {}
-    }
+      main: {
+        labels: {
+          title: 'NebulaE',
+        },
+      }
+    },
+    main: {},
+  },
+  pages: {
+    dashboard: {
+      labels: {
+        title: 'NebulaE',
+        intro: 'A Quasar framework hardware debugging toolset',
+      },
+    },
+    hidMonitor: {
+      labels: {
+        sentArea: 'Sent Data',
+        receivedArea: 'Received Data',
+      },
+    },
+    notFound: {
+      labels: {
+        title: '404',
+        intro: 'Oops, nothing here...',
+        return: 'Go home',
+      },
+    },
+  },
+  global: {
+    hid: {
+      notifications: {
+        onConnect: 'Device connected',
+        onDisconnect: 'Device disconnected',
+      },
+    },
   },
 }
