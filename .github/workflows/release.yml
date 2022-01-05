@@ -65,7 +65,7 @@ jobs:
       - name: Upload linux
         uses: actions/upload-artifact@v2
         with:
-          name: NebulaE-electron-win32-x64
+          name: NebulaE-electron-linux-x64
           path: dist/electron/NebulaE-linux-x64
 
       - name: Pack files
