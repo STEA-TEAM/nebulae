@@ -80,5 +80,5 @@ jobs:
           name: ${{ steps.vars.outputs.tag }}
           body: ${{ github.event.commits[0].message }}
           files: |
-            NebulaE-linux-x64.zip
-            NebulaE-win32-x64.zip
+            dist/electron/NebulaE-linux-x64.zip
+            dist/electron/NebulaE-win32-x64.zip
