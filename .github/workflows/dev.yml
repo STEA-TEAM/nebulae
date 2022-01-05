@@ -20,11 +20,12 @@ jobs:
 
       - name: Install packages
         run: |
+          npm install -g @quasar/cli
           npm install
 
       - name: Build the app for production
         run: |
-          npm run quasar build
+          quasar build
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
