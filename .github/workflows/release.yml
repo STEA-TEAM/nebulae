@@ -71,8 +71,8 @@ jobs:
       - name: Pack files
         run: |
           cd dist/electron
-          zip -r NebulaE-linux-x64.zip NebulaE-linux-x64
-          zip -r NebulaE-win32-x64.zip NebulaE-win32-x64
+          7z a -tzip NebulaE-linux-x64.zip NebulaE-linux-x64
+          7z a -tzip NebulaE-win32-x64.zip NebulaE-win32-x64
 
       - name: Release
         uses: softprops/action-gh-release@v1
