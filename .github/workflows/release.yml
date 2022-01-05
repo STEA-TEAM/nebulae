@@ -2,18 +2,17 @@ name: Quasar Release
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    tags:
+      - "v*"
 
 jobs:
-  release:
+  build-spa:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 16
         uses: actions/setup-node@v1
         with:
           node-version: 16.x
@@ -25,13 +24,7 @@ jobs:
 
       - name: Build the app for production
         run: |
-          quasar build
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: Nebula_Release
-          path: dist/spa
+          quasar build -m spa
 
       - name: Deploy to GitHub Pages
         uses: crazy-max/ghaction-github-pages@v2
@@ -40,3 +33,53 @@ jobs:
           build_dir: dist/spa
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-electron:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get tag name
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+
+      - name: Use Node.js 16
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+
+      - name: Install packages
+        run: |
+          npm install -g @quasar/cli
+          npm install
+
+      - name: Build the app for production
+        run: |
+          quasar mode add electron
+          quasar build -m electron
+
+      - name: Upload windows
+        uses: actions/upload-artifact@v2
+        with:
+          name: NebulaE-electron-win32-x64
+          path: dist/electron/NebulaE-win32-x64
+
+      - name: Upload linux
+        uses: actions/upload-artifact@v2
+        with:
+          name: NebulaE-electron-win32-x64
+          path: dist/electron/NebulaE-linux-x64
+
+      - name: Pack files
+        run: |
+          cd dist/electron
+          zip -r NebulaE-linux-x64.zip NebulaE-linux-x64
+          zip -r NebulaE-win32-x64.zip NebulaE-win32-x64
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ steps.vars.outputs.tag }}
+          body: ${{ github.event.commits[0].message }}
+          files: |
+            NebulaE-linux-x64.zip
+            NebulaE-win32-x64.zip

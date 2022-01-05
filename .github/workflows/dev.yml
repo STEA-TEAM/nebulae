@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 16
         uses: actions/setup-node@v1
         with:
           node-version: 16.x
@@ -24,16 +24,10 @@ jobs:
 
       - name: Build the app for development
         run: |
-          quasar mode add electron
-          quasar build -m electron
+          quasar build -m spa
 
-#      - name: Upload artifact
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: Nebula_SPA
-#          path: dist/spa
-
-      - name: List files
-        run: |
-          cd dist/electron
-          ls
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Nebula_SPA
+          path: dist/spa
