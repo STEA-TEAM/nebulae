@@ -32,3 +32,11 @@ jobs:
         with:
           name: Nebula_Release
           path: dist/spa
+
+      - name: Deploy to GitHub Pages
+        uses: crazy-max/ghaction-github-pages@v2
+        with:
+          target_branch: gh-pages
+          build_dir: dist/spa
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
