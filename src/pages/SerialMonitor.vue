@@ -4,41 +4,37 @@
     :class="pageClass">
     <div
       class="col-grow column q-gutter-y-sm">
-      <HexView
+      <TextView
         class="col-grow"
         color-scheme="green"
         icon="mdi-export"
         :label="i18n('labels.sentArea')"
         v-model="sentMessage"
-        @data:history="$refs.control.useHistory($event)"
         style="min-height: 40ch"/>
-      <HexView
+      <TextView
         class="col-grow"
         color-scheme="blue"
         icon="mdi-import"
         :label="i18n('labels.receivedArea')"
         v-model="receivedMessage"
-        @data:history="$refs.control.useHistory($event)"
         style="min-height: 40ch"/>
     </div>
     <div
       class="col-lg-3 col-xl-2"
       :class="functionAreaClass">
-      <DevicePanel class="col-12 col-sm-4 col-md-3 col-lg-auto"/>
-      <ControlPanel class="col-grow" ref="control"/>
+      <SerialControl class="col-grow" ref="control"/>
     </div>
   </q-page>
 </template>
 
 <script>
-import {defineComponent, watch} from 'vue';
-import HexView from "components/HexView";
-import DevicePanel from "components/HidDevice";
-import ControlPanel from "components/HidControl";
+import {defineComponent, watch} from "vue";
+import SerialControl from "components/SerialControl";
+import TextView from "components/TextView";
 
 export default defineComponent({
-  name: 'HidMonitor',
-  components: {ControlPanel, DevicePanel, HexView},
+  name: "SerialMonitor",
+  components: {SerialControl, TextView},
   data() {
     return {
       sentMessage: null,
@@ -46,8 +42,8 @@ export default defineComponent({
     }
   },
   created() {
-    watch(() => this.$hid.sentMessage, (value) => this.sentMessage = value);
-    watch(() => this.$hid.receivedMessage, (value) => this.receivedMessage = value);
+    watch(() => this.$serial.sentMessage, (value) => this.sentMessage = value);
+    watch(() => this.$serial.receivedMessage, (value) => this.receivedMessage = value);
   },
   computed: {
     pageClass() {
@@ -68,7 +64,7 @@ export default defineComponent({
       return this.$t('pages.hidMonitor.' + relativePath);
     },
   }
-})
+});
 </script>
 
 <style scoped>

@@ -1,30 +1,16 @@
 export default {
   components: {
-    controlPanel: {
+    hidControl: {
       buttons: {
         send: 'Send Report',
         sendShort: 'Send',
         clear: 'Clear Data',
         clearShort: 'Clear',
       },
-      dialog: {
-        title: 'Saved Reports',
-        noItemText: 'No saved reports',
-        dismissText: 'Dismiss',
-        chipText: 'Report ID',
-        tooltipTitle: 'Data Packs',
-      },
-      inputs: {
-        label: 'Save name',
-      },
       notifications: {
         clearData: 'Successfully cleared data packs',
         invalidHistory: 'Invalid history report: No matching report ID',
         validHistory: 'Successfully copied history',
-        saveSuccess: 'Successfully saved report',
-        loadFailed: 'Invalid report save: No matching report ID',
-        loadSuccess: 'Successfully loaded save',
-        deleteSuccess: 'Successfully deleted save',
       },
       selects: {
         noItem: 'No output report available',
@@ -32,12 +18,8 @@ export default {
         reportShort: 'Report',
         unit: 'Bytes',
       },
-      tooltips: {
-        openSaves: 'Open saved list',
-        saveReport: 'Save this report',
-      },
     },
-    devicePanel: {
+    hidDevice: {
       infoDialog: {
         title: 'Device info',
         cancelText: 'OK',
@@ -45,7 +27,7 @@ export default {
       buttons: {
         connect: 'Connect',
         disconnect: 'Disconnect',
-        request: 'Device not on the list?',
+        request: 'Authorize',
       },
       checkDialog: {
         title: 'Check devices',
@@ -83,11 +65,57 @@ export default {
     languagesMenu: {
       labels: {},
     },
+    saveManager: {
+      inputs: {
+        label: 'Save name',
+      },
+      dialog: {
+        title: 'Saved Reports',
+        noItemText: 'No saved reports',
+        dismissText: 'Dismiss',
+        chipText: 'Report ID',
+        tooltipTitle: 'Data Packs',
+      },
+      notifications: {
+        saveSuccess: 'Successfully saved report',
+        deleteSuccess: 'Successfully deleted save',
+        loadFailed: 'Invalid report save: No matching report ID',
+        loadSuccess: 'Successfully loaded save',
+      },
+      tooltips: {
+        openSaves: 'Open saved list',
+        saveReport: 'Save this report',
+      },
+    },
+    serialControl: {
+      buttons: {
+        send: 'Send Report',
+        sendShort: 'Send',
+        connect: 'Connect',
+        disconnect: 'Disconnect',
+      },
+      notifications: {
+        clearData: 'Successfully cleared data packs',
+        invalidHistory: 'Invalid history report: No matching report ID',
+        validHistory: 'Successfully copied history',
+      },
+      selects: {
+        noItem: 'No output report available',
+        label: 'Select Baud Rate',
+        labelShort: 'Baud/s',
+      },
+    },
     settingsMenu: {
       labels: {
         darkMode: 'Dark mode',
       },
-    }
+    },
+    textView: {
+      tooltips: {
+        autoScroll: 'Scroll table automatically',
+        clearData: 'Clear all history',
+      }
+    },
   },
   layouts: {
     drawers: {

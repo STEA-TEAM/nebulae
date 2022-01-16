@@ -11,8 +11,7 @@
     @update:modelValue="rawData=$event"
     :rules="[dataRule]"
     @focus="onFocus"
-    @blur="focused=false">
-  </q-input>
+    @blur="focused=false"/>
 </template>
 
 <script>

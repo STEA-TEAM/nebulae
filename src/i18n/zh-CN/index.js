@@ -1,30 +1,16 @@
 export default {
   components: {
-    controlPanel: {
+    hidControl: {
       buttons: {
         send: '发送报文',
         sendShort: '发送',
         clear: '清空数据',
         clearShort: '清空',
       },
-      dialog: {
-        title: '已保存的报文',
-        noItemText: '没有保存的报文',
-        dismissText: '隐藏',
-        chipText: '报文ID',
-        tooltipTitle: '数据包',
-      },
-      inputs: {
-        label: '存档名称',
-      },
       notifications: {
         clearData: '清零数据成功',
         invalidHistory: '历史报文无效：当前设备没有匹配的报文ID',
         validHistory: '复制历史报文成功',
-        saveSuccess: '保存报文成功',
-        loadFailed: '报文存档无效: 当前设备没有匹配的报文ID',
-        loadSuccess: '加载报文存档成功',
-        deleteSuccess: '删除报文存档成功',
       },
       selects: {
         noItem: '没有可用的输出类报文',
@@ -32,12 +18,8 @@ export default {
         reportShort: '报文',
         unit: '字节',
       },
-      tooltips: {
-        openSaves: '打开报文存档列表',
-        saveReport: '保存当前报文',
-      },
     },
-    devicePanel: {
+    hidDevice: {
       infoDialog: {
         title: '设备信息',
         cancelText: '确定',
@@ -45,7 +27,7 @@ export default {
       buttons: {
         connect: '连接',
         disconnect: '断开',
-        request: '设备不在列表内？',
+        request: '新授权',
       },
       checkDialog: {
         title: '确认连接设备列表',
@@ -83,11 +65,57 @@ export default {
     languagesMenu: {
       labels: {},
     },
+    saveManager: {
+      inputs: {
+        label: '存档名称',
+      },
+      dialog: {
+        title: '已保存的报文',
+        noItemText: '没有保存的报文',
+        dismissText: '隐藏',
+        chipText: '报文ID',
+        tooltipTitle: '数据包',
+      },
+      notifications: {
+        saveSuccess: '保存报文成功',
+        loadFailed: '报文存档无效: 当前设备没有匹配的报文ID',
+        loadSuccess: '加载报文存档成功',
+        deleteSuccess: '删除报文存档成功',
+      },
+      tooltips: {
+        openSaves: '打开报文存档列表',
+        saveReport: '保存当前报文',
+      },
+    },
+    serialControl: {
+      buttons: {
+        send: '发送报文',
+        sendShort: '发送',
+        connect: '连接',
+        disconnect: '断开',
+      },
+      notifications: {
+        clearData: '清零数据成功',
+        invalidHistory: '历史报文无效：当前设备没有匹配的报文ID',
+        validHistory: '复制历史报文成功',
+      },
+      selects: {
+        noItem: '没有可用的输出类报文',
+        label: '选择波特率',
+        labelShort: '波特率',
+      },
+    },
     settingsMenu: {
       labels: {
         darkMode: '暗色模式',
       },
-    }
+    },
+    textView: {
+      tooltips: {
+        autoScroll: '自动滚动到表格底部',
+        clearData: '清空历史数据',
+      }
+    },
   },
   layouts: {
     drawers: {

@@ -20,6 +20,14 @@ const routes = [
           header: () => import('layouts/headers/MainHeader'),
         }
       },
+      {
+        path: 'serial',
+        components: {
+          default: () => import('pages/SerialMonitor'),
+          drawer: () => import('layouts/drawers/MainDrawer'),
+          header: () => import('layouts/headers/MainHeader'),
+        }
+      },
     ]
   },
 

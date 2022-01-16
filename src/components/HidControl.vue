@@ -72,7 +72,7 @@
           @click="clearDataPacks"/>
       </div>
       <q-space/>
-      <div :class="actionPairClass">
+      <div>
         <q-input
           class="col-grow"
           clearable
@@ -139,7 +139,7 @@ import HexInput from "components/HexInput";
 import ListDialog from "components/ListDialog";
 
 export default defineComponent({
-  name: 'ControlPanel',
+  name: 'HidControl',
   components: {HexInput},
   data() {
     return {
@@ -175,7 +175,7 @@ export default defineComponent({
         }
 
         let savedReports = this.$q.localStorage.getItem(
-          `data.savedReports.${value['vendorId']}_${value['productId']}`
+          `data.hidReports.${value['vendorId']}_${value['productId']}`
         );
         if (savedReports) {
           this.savedReports = savedReports;
@@ -329,7 +329,7 @@ export default defineComponent({
       };
       this.savedReports.push(saved);
       this.$q.localStorage.set(
-        `data.savedReports.${this.$hid.device.vendorId}_${this.$hid.device.productId}`,
+        `data.hidReports.${this.$hid.device.vendorId}_${this.$hid.device.productId}`,
         this.savedReports
       );
       this.$q.notify({
@@ -341,7 +341,7 @@ export default defineComponent({
     deleteReport(index) {
       this.savedReports.splice(index, 1);
       this.$q.localStorage.set(
-        `data.savedReports.${this.$hid.device.vendorId}_${this.$hid.device.productId}`,
+        `data.hidReports.${this.$hid.device.vendorId}_${this.$hid.device.productId}`,
         this.savedReports
       );
       this.$q.notify({
@@ -374,7 +374,7 @@ export default defineComponent({
       }
     },
     i18n(relativePath) {
-      return this.$t('components.controlPanel.' + relativePath);
+      return this.$t('components.hidControl.' + relativePath);
     }
   }
 })

@@ -52,7 +52,7 @@ export default defineComponent({
       {
         label: 'serial',
         icon: 'mdi-serial-port',
-        available: false,
+        available: true,
         route: '/serial',
         separator: false,
       },
