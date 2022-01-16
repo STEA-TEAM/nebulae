@@ -17,7 +17,7 @@ function messagePacker(id, buffer) {
   return message;
 }
 
-const HidDevice = reactive({
+const HidHelper = reactive({
   device: ref(null),
   sentMessage: ref(null),
   receivedMessage: ref(null),
@@ -43,14 +43,16 @@ const HidDevice = reactive({
   },
 
   disconnect() {
-    this.device["close"]().then(() => {
-      this.device = null;
-      Notify.create({
-        type: 'info',
-        message: 'Device closed',
-        icon: 'link_off'
+    if (this.device) {
+      this.device["close"]().then(() => {
+        this.device = null;
+        Notify.create({
+          type: 'info',
+          message: 'Device closed',
+          icon: 'link_off'
+        });
       });
-    });
+    }
   },
 
   sendReport(id, data) {
@@ -67,5 +69,5 @@ const HidDevice = reactive({
 })
 
 export default boot(({app}) => {
-  app.config.globalProperties.$hid = HidDevice;
+  app.config.globalProperties.$hid = HidHelper;
 });
