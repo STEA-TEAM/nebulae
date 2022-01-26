@@ -132,7 +132,7 @@
 </template>
 
 <script>
-import {defineComponent, watch} from 'vue'
+import {defineComponent, ref, watch} from 'vue'
 import {hexToBuffer} from "src/scripts/utils";
 
 import HexInput from "components/HexInput";
@@ -310,7 +310,7 @@ export default defineComponent({
         }).onDismiss(() => {
           this.dialog = null;
         });
-      }else {
+      } else {
         this.dialog.hide();
       }
     },

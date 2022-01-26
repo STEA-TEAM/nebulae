@@ -23,33 +23,52 @@
         flat
         icon-right="delete_sweep"
         size="lg"
-        @click="dataString=''">
+        @click="displayData=[]">
         <q-tooltip :delay="500">
           {{ i18n('tooltips.clearData') }}
         </q-tooltip>
       </q-btn>
     </q-toolbar>
-    <q-scroll-area
-      v-show="!this.dataString.empty"
-      class="col-grow"
-      ref="scrollArea"
-      style="z-index: 2">
-      <div style="white-space: pre;">
-        {{ this.dataString }}
-      </div>
-    </q-scroll-area>
+    <q-tab-panels
+      class="col-grow column"
+      animated
+      v-model="displayType">
+      <q-tab-panel class="col-grow" name="list">
+        <q-virtual-scroll
+          :items="this.displayData"
+          ref="scrollArea"
+          style="max-height: 300px;">
+          <template v-slot="{item, index}">
+            <q-item
+              :key="index"
+              dense>
+              <q-item-section>
+                <q-item-label>
+                  {{ item }}
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+          </template>
+        </q-virtual-scroll>
+      </q-tab-panel>
+      <q-tab-panel name="table">
+      </q-tab-panel>
+      <q-tab-panel name="graph">
+      </q-tab-panel>
+    </q-tab-panels>
+
   </q-card>
 </template>
 
 <script>
-import {defineComponent} from 'vue'
+import {computed, defineComponent} from 'vue'
 
 export default defineComponent({
   name: 'TextView',
   props: {
     modelValue: {
       type: String,
-      default: () => '',
+      default: () => 'list',
     },
     icon: {
       type: String,
@@ -63,12 +82,23 @@ export default defineComponent({
       type: String,
       default: () => 'primary'
     },
+    data: {
+      type: String,
+      default: () => '',
+    },
+  },
+  setup(props, {emit}) {
+    const displayType = computed({
+      get: () => props.modelValue,
+      set: (value) => emit('update:modelValue', value),
+    });
+    return {displayType}
   },
   data() {
     return {
       autoScroll: true,
       scrollInterval: null,
-      dataString: '',
+      displayData: [],
       oldDataCount: 0,
     }
   },
@@ -76,19 +106,21 @@ export default defineComponent({
     this.scrollInterval = setInterval(this.scrollToBottom, 10);
   },
   watch: {
-    modelValue(value) {
+    data(value) {
       if (value) {
-        this.dataString += value;
+        this.displayData = this.displayData.concat(
+          (this.displayData.pop() + value).split('\n')
+        );
       }
     },
   },
   methods: {
     scrollToBottom() {
-      if (this.autoScroll && this.oldDataCount !== this.dataString.length) {
-        this.oldDataCount = this.dataString.length;
-        this.$refs.scrollArea.setScrollPosition(
-          'vertical',
-          this.$refs.scrollArea.getScroll().verticalSize
+      if (this.autoScroll && this.oldDataCount !== this.displayData.length) {
+        this.oldDataCount = this.displayData.length;
+        this.$refs.scrollArea.scrollTo(
+          this.oldDataCount,
+          'end-force'
         );
       }
     },

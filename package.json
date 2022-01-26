@@ -18,12 +18,14 @@
   "dependencies": {
     "@electron/remote": "^2.0.1",
     "@quasar/extras": "^1.0.0",
+    "@shelf/fast-chunk-string": "^2.0.0",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "quasar": "^2.0.0",
     "vue": "^3.2.26",
     "vue-i18n": "^9.0.0",
-    "vue-router": "^4.0.11"
+    "vue-router": "^4.0.11",
+    "vue3-apexcharts": "^1.4.1"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.13.14",

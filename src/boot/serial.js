@@ -25,7 +25,7 @@ const SerialHelper = reactive({
         icon: 'link'
       });
       this.readInterval = setInterval(async () => {
-        if (this.port && (this.reader === null || !this.port.readable.locked)) {
+        if ((this.reader === null || !this.port.readable.locked) && this.port) {
           console.log("Try get reader");
           if (this.port.readable) {
             this.reader = this.port.readable.getReader();
@@ -61,7 +61,6 @@ const SerialHelper = reactive({
   async disconnect() {
     if (this.port && this.reader) {
       this.reader.cancel().then(() => {
-        console.log(this.port.readable.locked);
         this.port["close"]().then(() => {
           this.port = null;
           Notify.create({

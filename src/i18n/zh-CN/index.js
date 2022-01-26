@@ -1,5 +1,11 @@
 export default {
   components: {
+    dataVisualizer: {
+      tooltips: {
+        autoScroll: '自动滚动到表格底部',
+        clearData: '清空历史数据',
+      },
+    },
     hidControl: {
       buttons: {
         send: '发送报文',
@@ -103,6 +109,11 @@ export default {
         noItem: '没有可用的输出类报文',
         label: '选择波特率',
         labelShort: '波特率',
+      },
+      tabs: {
+        list: '列表',
+        table: '表格',
+        graph: '图表',
       },
     },
     settingsMenu: {

@@ -77,7 +77,6 @@ export default defineComponent({
   components: {SaveManager},
   setup() {
     const baudList = [
-      'custom',
       110,
       300,
       600,
@@ -100,10 +99,10 @@ export default defineComponent({
       1000000,
       2000000,
       3000000,
-    ];
+    ]
     return {
       baudList,
-    }
+    };
   },
   data() {
     return {
@@ -171,34 +170,11 @@ export default defineComponent({
     sendReport() {
       this.$serial.sendReport(this.selectedBaud.id, hexToBuffer(this.dataPacks.join('')));
     },
-    useHistory(history) {
-      let found = false;
-      this.baudList.forEach(baud => {
-        if (baud === history['baud']) {
-          this.selectedBaud = baud;
-          // TODO: Set input area
-          found = true;
-        }
-      });
-      if (!found) {
-        this.$q.notify({
-          type: 'warning',
-          message: this.i18n('notifications.invalidHistory'),
-          icon: 'mdi-message-alert-outline'
-        });
-      } else {
-        this.$q.notify({
-          type: 'positive',
-          message: this.i18n('notifications.validHistory'),
-          icon: 'mdi-comment-check-outline'
-        });
-      }
-    },
     saveWrapper(label) {
       return {
         label: label,
-        caption: `Baud: 0x${
-          this.$hid.device.vendorId.toString(16).toUpperCase().padStart(4, '0')
+        caption: `Baud/s: ${
+          this.selectedBaud
         }`,
         tooltip: this.rawData.toString(),
         baud: this.selectedBaud,

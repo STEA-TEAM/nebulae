@@ -1,5 +1,16 @@
 export default {
   components: {
+    dataVisualizer: {
+      tooltips: {
+        autoScroll: 'Scroll table automatically',
+        clearData: 'Clear all history',
+      },
+      notifications: {
+        rowNotFound: 'Row(s) not found. Is the buffer size too small?',
+        columnNotFound: 'Column(s) not found. Is the separator correct?',
+        validHistory: 'Successfully copied history',
+      },
+    },
     hidControl: {
       buttons: {
         send: 'Send Report',
@@ -104,6 +115,11 @@ export default {
         label: 'Select Baud Rate',
         labelShort: 'Baud/s',
       },
+      tabs: {
+        list: 'List',
+        table: 'Table',
+        graph: 'Graph',
+      },
     },
     settingsMenu: {
       labels: {
@@ -114,7 +130,7 @@ export default {
       tooltips: {
         autoScroll: 'Scroll table automatically',
         clearData: 'Clear all history',
-      }
+      },
     },
   },
   layouts: {

@@ -11,11 +11,9 @@
         :label="i18n('labels.sentArea')"
         v-model="sentMessage"
         style="min-height: 40ch"/>
-      <TextView
+      <DataVisualizer
         class="col-grow"
-        color-scheme="blue"
-        icon="mdi-import"
-        :label="i18n('labels.receivedArea')"
+        :toolbar="receiveToolbar"
         v-model="receivedMessage"
         style="min-height: 40ch"/>
     </div>
@@ -31,12 +29,18 @@
 import {defineComponent, watch} from "vue";
 import SerialControl from "components/SerialControl";
 import TextView from "components/TextView";
+import DataVisualizer from "components/DataVisualizer";
 
 export default defineComponent({
   name: "SerialMonitor",
-  components: {SerialControl, TextView},
+  components: {DataVisualizer, SerialControl, TextView},
   data() {
     return {
+      receiveToolbar: {
+        icon: "mdi-import",
+        label: this.i18n("labels.receivedArea"),
+        colorScheme: "blue"
+      },
       sentMessage: null,
       receivedMessage: null,
     }
