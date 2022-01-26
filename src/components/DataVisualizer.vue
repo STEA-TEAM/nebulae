@@ -53,6 +53,7 @@ import {defineComponent, reactive, ref} from "vue";
 
 import VueApexCharts from "vue3-apexcharts";
 import {tableConstructor} from "src/scripts/utils";
+import serial from "boot/serial";
 
 export default defineComponent({
   name: "DataVisualizer",
@@ -75,16 +76,17 @@ export default defineComponent({
   },
   setup() {
     const buffer = ref("");
-    const bufferSize = ref(1000);
+    const bufferSize = ref(4000);
     const chartData = ref([]);
     const chartDataRange = ref([]);
-    const chartDataSize = ref(10 ** 3);
+    const chartDataSize = ref(1000);
     const displayData = ref([]);
-    const displayDataSize = ref(10 ** 5);
+    const displayDataSize = ref(100000);
 
     const rowSeparator = ref("\n");
     const columnSeparator = ref(",");
     const splitterRatio = ref(50);
+    const chartRange = ref(200);
     return {
       buffer,
       bufferSize,
@@ -97,7 +99,29 @@ export default defineComponent({
       rowSeparator,
       columnSeparator,
       splitterRatio,
+      chartRange,
     };
+  },
+  data() {
+    return {
+      dataPushCount: 0,
+      chartOptions: {
+        chart: {
+          animations: {
+            enabled: false,
+          }
+        },
+        stroke: {
+          curve: "straight",
+          lineCap: "round",
+          width: 1.5,
+        },
+        xaxis: {
+          type: "numeric",
+          range: this.chartRange,
+        },
+      }
+    }
   },
   watch: {
     modelValue(value) {
@@ -112,16 +136,15 @@ export default defineComponent({
                 this.chartData[index] = {data: [row[index]]};
               } else {
                 this.chartData[index].data.push(row[index]);
-                if (this.chartData[index].data.length > this.chartDataSize) {
-                  this.chartData[index].data.shift();
-                }
               }
             }
             this.displayData.push(row);
-            if (this.displayData.length > this.displayDataSize) {
-              this.displayData.shift();
-            }
+            this.dataPushCount++;
           });
+          if (this.dataPushCount > this.chartRange) {
+            this.trimData();
+            this.dataPushCount = 0;
+          }
         } catch (err) {
           if (err.message === "NoRowException") {
             this.$q.notify({
@@ -137,25 +160,26 @@ export default defineComponent({
       }
     },
   },
-  computed: {
-    chartOptions() {
-      return {
-        stroke: {
-          curve: "straight",
-          lineCap: "round",
-          width: 1.5,
-        },
-        xaxis: {
-          type: "numeric",
-          range: this.displayData.length - 1 < 100 ? this.displayData.length - 1 : 100,
-        },
-      }
-    },
-  },
   methods: {
     clearData() {
       this.chartData = [];
       this.displayData = [];
+    },
+    trimData() {
+      if (this.displayData.length > this.displayDataSize) {
+        this.displayData.splice(
+          0,
+          this.displayData.length - this.displayDataSize
+        );
+      }
+      this.chartData.forEach(series => {
+        if (series['data'].length > this.chartDataSize) {
+          series['data'].splice(
+            0,
+            series['data'].length - this.chartDataSize
+          );
+        }
+      });
     },
     i18n(relativePath) {
       return this.$t('components.dataVisualizer.' + relativePath);
