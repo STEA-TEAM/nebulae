@@ -3,6 +3,7 @@ export default {
     dataVisualizer: {
       tooltips: {
         autoScroll: 'Scroll table automatically',
+        collapsed: 'Expand/Collapse area',
         clearData: 'Clear all history',
       },
       notifications: {

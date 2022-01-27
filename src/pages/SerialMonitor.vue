@@ -4,18 +4,16 @@
     :class="pageClass">
     <div
       class="col-grow column q-gutter-y-sm">
-      <TextView
+      <DataVisualizer
         class="col-grow"
-        color-scheme="green"
-        icon="mdi-export"
-        :label="i18n('labels.sentArea')"
         v-model="sentMessage"
-        style="min-height: 40ch"/>
+        :toolbar="sendToolbar"
+        display-type="table"
+        hide/>
       <DataVisualizer
         class="col-grow"
         :toolbar="receiveToolbar"
-        v-model="receivedMessage"
-        style="min-height: 40ch"/>
+        v-model="receivedMessage"/>
     </div>
     <div
       class="col-lg-3 col-xl-2"
@@ -28,14 +26,18 @@
 <script>
 import {defineComponent, watch} from "vue";
 import SerialControl from "components/SerialControl";
-import TextView from "components/TextView";
 import DataVisualizer from "components/DataVisualizer";
 
 export default defineComponent({
   name: "SerialMonitor",
-  components: {DataVisualizer, SerialControl, TextView},
+  components: {DataVisualizer, SerialControl},
   data() {
     return {
+      sendToolbar: {
+        icon: "mdi-import",
+        label: this.i18n("labels.sentArea"),
+        colorScheme: "green"
+      },
       receiveToolbar: {
         icon: "mdi-import",
         label: this.i18n("labels.receivedArea"),

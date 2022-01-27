@@ -13,7 +13,7 @@ const {configure} = require('quasar/wrappers');
 module.exports = configure(function (ctx) {
   return {
     // https://quasar.dev/quasar-cli/supporting-ts
-    supportTS: false,
+    supportTS: true,
 
     // https://quasar.dev/quasar-cli/prefetch-feature
     // preFetch: true,
@@ -26,6 +26,7 @@ module.exports = configure(function (ctx) {
       'i18n',
       'hid',
       'serial',
+      'vecharts',
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css

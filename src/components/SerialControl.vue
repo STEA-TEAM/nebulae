@@ -58,7 +58,6 @@
         counter
         dense
         outlined
-        type="textarea"
         :model-value="rawData"
         @update:modelValue="rawData=$event"
         :rules="[dataRule]"/>

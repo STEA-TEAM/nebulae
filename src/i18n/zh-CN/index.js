@@ -3,6 +3,7 @@ export default {
     dataVisualizer: {
       tooltips: {
         autoScroll: '自动滚动到表格底部',
+        collapsed: '展开/收起区域',
         clearData: '清空历史数据',
       },
     },
