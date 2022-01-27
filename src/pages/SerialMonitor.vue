@@ -13,7 +13,8 @@
       <DataVisualizer
         class="col-grow"
         :toolbar="receiveToolbar"
-        v-model="receivedMessage"/>
+        v-model="receivedMessage"
+        display-type="chart"/>
     </div>
     <div
       class="col-lg-3 col-xl-2"
