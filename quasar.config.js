@@ -73,6 +73,7 @@ module.exports = configure(function (/* ctx */) {
       // extendViteConf (viteConf) {},
 
       alias: {
+        assets: path.join(__dirname, './src/assets'),
         css: path.join(__dirname, './src/css'),
         types: path.join(__dirname, './src/types'),
         utils: path.join(__dirname, './src/utils'),
