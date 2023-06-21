@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
 
-const menuList = [
+const navigations = [
   {
     label: 'dashboard',
     icon: 'view_quilt',
@@ -36,7 +36,7 @@ const menuList = [
     available: true,
     route: '/bluetooth',
     separator: false,
-  }
+  },
 ];
 
 const { t } = useI18n();
@@ -46,31 +46,28 @@ const i18n = (relativePath: string) => {
 </script>
 
 <template>
-  <q-drawer
-    bordered
-    overlay
-    side="left">
+  <q-drawer bordered overlay side="left">
     <q-list>
-      <template v-for="(menuItem, index) in menuList" :key="index">
+      <template v-for="(navigation, index) in navigations" :key="index">
         <q-item
-          :clickable="menuItem.available"
-          :v-ripple="menuItem.available"
-          @click="$router.push(menuItem.route)">
+          :clickable="navigation.available"
+          :v-ripple="navigation.available"
+          @click="$router.push(navigation.route)"
+        >
           <q-item-section avatar>
             <q-icon
-              :name="menuItem.icon"
-              :color="menuItem.available?'primary':'grey'"/>
+              :name="navigation.icon"
+              :color="navigation.available ? 'primary' : 'grey'"
+            />
           </q-item-section>
-          <q-item-section :class="menuItem.available?'':'text-grey'">
-            {{ i18n('labels.' + menuItem.label) }}
+          <q-item-section :class="navigation.available ? '' : 'text-grey'">
+            {{ i18n('navigations.' + navigation.label) }}
           </q-item-section>
         </q-item>
-        <q-separator v-if="menuItem.separator"/>
+        <q-separator v-if="navigation.separator" />
       </template>
     </q-list>
   </q-drawer>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

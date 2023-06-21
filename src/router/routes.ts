@@ -13,7 +13,7 @@ const routes: RouteRecordRaw[] = [
           leftDrawer: () => import('layouts/drawers/LeftMainDrawer.vue'),
           default: () => import('pages/DashboardPage.vue'),
           rightDrawer: () => import('layouts/drawers/RightMainDrawer.vue'),
-        }
+        },
       },
       {
         path: 'bluetooth',
@@ -23,7 +23,15 @@ const routes: RouteRecordRaw[] = [
           default: () => import('pages/BluetoothPage.vue'),
           rightDrawer: () => import('layouts/drawers/RightMainDrawer.vue'),
           footer: () => import('layouts/footers/BluetoothFooter.vue'),
-        }
+        },
+        children: [
+          {
+            path: '',
+            components: {
+              devicePanel: () => import('components/BluetoothDevices.vue'),
+            },
+          },
+        ],
       },
     ],
   },

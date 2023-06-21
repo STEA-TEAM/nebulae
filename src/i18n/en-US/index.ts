@@ -1,5 +1,16 @@
 export default {
   components: {
+    BluetoothDevices: {
+      DeviceFilter: {
+        hints:{
+          dataFilter: 'Filter by raw advertising data',
+          nameFilter: 'Filter by name or MAC',
+        },
+        labels: {
+          noFilter: 'No filter',
+        },
+      },
+    },
     DarkModeButton: {
       labels: {
         toggleDarkMode: 'Toggle dark mode',
@@ -9,12 +20,26 @@ export default {
   layouts: {
     drawers: {
       LeftMainDrawer: {
+        labels: {},
+        navigations: {
+          dashboard: 'Dashboard',
+          serial: 'Serial',
+          usb: 'USB',
+          hid: 'HID',
+          bluetooth: 'Bluetooth',
+        },
+      },
+      RightMainDrawer: {
         labels: {
           dashboard: 'Dashboard',
           serial: 'Serial',
           usb: 'USB',
           hid: 'HID',
           bluetooth: 'Bluetooth',
+        },
+        tabs: {
+          devices: 'Devices',
+          messages: 'Messages',
         },
       },
     },
