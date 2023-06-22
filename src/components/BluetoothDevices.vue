@@ -18,23 +18,23 @@ const { addFilter, connect, removeFilter } = useBluetoothStore();
 
 <template>
   <div class="column">
-    <div class="row">
+    <div class="q-pa-sm q-gutter-sm" :class="mini ? 'column' :'row'">
       <q-btn
-        class="col-grow q-ma-sm"
+        class="col-grow"
+        color="primary"
+        dense
+        label="Search Device"
+        no-caps
+        @click="connect"
+      />
+      <q-btn
+        class="col-grow"
         color="accent"
         dense
         icon="add"
         label="Add Filter"
         no-caps
         @click="addFilter"
-      />
-      <q-btn
-        class="col-grow q-ma-sm"
-        color="primary"
-        dense
-        label="Search Device"
-        no-caps
-        @click="connect"
       />
     </div>
     <q-separator v-show="currentFilters.length" />
