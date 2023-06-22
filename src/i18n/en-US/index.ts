@@ -2,7 +2,7 @@ export default {
   components: {
     BluetoothDevices: {
       DeviceFilter: {
-        hints:{
+        hints: {
           dataFilter: 'Filter by raw advertising data',
           nameFilter: 'Filter by name or MAC',
         },

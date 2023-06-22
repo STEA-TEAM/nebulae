@@ -28,7 +28,7 @@ const toggleRightDrawer = () => {
         </q-avatar>
         {{ i18n('labels.title') }}
       </q-toolbar-title>
-      <dark-mode-button/>
+      <dark-mode-button />
       <q-btn dense flat icon="menu" round @click="toggleRightDrawer" />
     </q-toolbar>
   </q-header>

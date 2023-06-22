@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { extend, useQuasar } from 'quasar';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -30,13 +30,12 @@ const i18n = (relativePath: string) => {
 </script>
 
 <template>
-  <q-drawer bordered overlay side="right" :width="width">
+  <q-drawer :width="width" bordered overlay side="right">
     <q-tabs
       v-show="width > RIGHT_DRAWER_WIDTHS.min"
-
+      v-model="tab.name"
       inline-label
       no-caps
-      v-model="tab.name"
     >
       <q-tab
         v-for="(tabItem, index) in tabs"
@@ -48,9 +47,9 @@ const i18n = (relativePath: string) => {
     </q-tabs>
     <q-btn-dropdown
       v-show="width === RIGHT_DRAWER_WIDTHS.min"
-      class="full-width"
       :icon="tab.icon"
       :label="i18n(`tabs.${tab.name}`)"
+      class="full-width"
       no-caps
       outline
       padding="12px 0"
@@ -60,8 +59,8 @@ const i18n = (relativePath: string) => {
         <q-item
           v-for="(tabItem, index) in tabs"
           :key="index"
-          clickable
           v-close-popup
+          clickable
           @click="tab = tabItem"
         >
           <q-item-section avatar>
@@ -73,7 +72,7 @@ const i18n = (relativePath: string) => {
         </q-item>
       </q-list>
     </q-btn-dropdown>
-    <q-tab-panels animated v-model="tab.name">
+    <q-tab-panels v-model="tab.name" animated>
       <q-tab-panel class="q-pa-none" name="devices">
         <router-view
           :mini="width === RIGHT_DRAWER_WIDTHS.min"
@@ -89,12 +88,12 @@ const i18n = (relativePath: string) => {
     </q-tab-panels>
     <resize-line
       v-show="screen.gt.sm"
-      class="absolute-left full-height"
+      v-model="width"
       :max-size="RIGHT_DRAWER_WIDTHS.max"
       :min-size="RIGHT_DRAWER_WIDTHS.min"
-      reverse
       :snap-size="RIGHT_DRAWER_WIDTHS.snap"
-      v-model="width"
+      class="absolute-left full-height"
+      reverse
     />
   </q-drawer>
 </template>
