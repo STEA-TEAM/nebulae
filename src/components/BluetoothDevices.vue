@@ -8,17 +8,21 @@ export interface Props {
   mini?: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   mini: false,
 });
 
 const { currentFilters } = storeToRefs(useBluetoothStore());
 const { addFilter, connect, removeFilter } = useBluetoothStore();
+
+const openFilterDialog = () => {
+  console.log('openFilterDialog');
+};
 </script>
 
 <template>
   <div class="column">
-    <div class="q-pa-sm q-gutter-sm" :class="mini ? 'column' :'row'">
+    <div :class="mini ? 'column' : 'row'" class="q-pa-sm q-gutter-sm">
       <q-btn
         class="col-grow"
         color="primary"
@@ -28,23 +32,25 @@ const { addFilter, connect, removeFilter } = useBluetoothStore();
         @click="connect"
       />
       <q-btn
+        :icon="mini ? 'settings' : 'add'"
+        :label="mini ? 'Edit Filters' : 'Add Filter'"
         class="col-grow"
         color="accent"
         dense
-        icon="add"
-        label="Add Filter"
         no-caps
-        @click="addFilter"
+        @click="mini ? openFilterDialog() : addFilter()"
       />
     </div>
     <q-separator v-show="currentFilters.length" />
-    <device-filter
-      v-for="(currentFilter, index) in currentFilters"
-      :key="index"
-      :model-value="currentFilter"
-      @delete="removeFilter(index)"
-      @update:model-value="currentFilters[index] = $event"
-    />
+    <template v-if="!mini">
+      <device-filter
+        v-for="(currentFilter, index) in currentFilters"
+        :key="index"
+        :model-value="currentFilter"
+        @delete="removeFilter(index)"
+        @update:model-value="currentFilters[index] = $event"
+      />
+    </template>
     <q-separator />
     <div class="row"></div>
   </div>
