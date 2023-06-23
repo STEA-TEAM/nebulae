@@ -25,7 +25,7 @@ const openFilterDialog = () => {
     <div :class="mini ? 'column' : 'row'" class="q-pa-sm q-gutter-sm">
       <q-btn
         class="col-grow"
-        color="primary"
+        color="positive"
         dense
         label="Search Device"
         no-caps

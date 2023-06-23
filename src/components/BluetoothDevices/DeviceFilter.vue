@@ -26,6 +26,9 @@ const filterLabel = computed(() => {
   if (filter.value.name) {
     filterArray.push(filter.value.name);
   }
+  if (filter.value.namePrefix) {
+    filterArray.push(filter.value.name);
+  }
   if (filter.value.manufacturerData) {
     filterArray.push(filter.value.manufacturerData.join(', '));
   }
@@ -45,7 +48,7 @@ const filterLabel = computed(() => {
 </script>
 
 <template>
-  <q-expansion-item switch-toggle-side>
+  <q-expansion-item group="deviceFilters" switch-toggle-side>
     <template v-slot:header>
       <q-item-section>
         <q-item-label>
@@ -79,6 +82,39 @@ const filterLabel = computed(() => {
           <q-btn dense flat icon="mdi-dots-vertical" round />
         </template>
       </q-input>
+      <q-input
+        v-model="filter['namePrefix']"
+        :placeholder="i18n('hints.namePrefixFilter')"
+        clearable
+        dense
+      >
+        <template v-slot:before>
+          <q-icon name="mdi-regex" />
+        </template>
+        <template v-slot:after>
+          <q-btn dense flat icon="mdi-dots-vertical" round />
+        </template>
+      </q-input>
+      <div class="row q-gutter-sm">
+        <q-btn
+          :label="i18n('labels.editServices')"
+          class="col-grow"
+          color="amber"
+          dense
+          icon="mdi-chart-donut-variant"
+          no-caps
+          outline
+        />
+        <q-btn
+          :label="i18n('labels.editManufacturers')"
+          class="col-grow"
+          color="amber"
+          dense
+          icon="mdi-factory"
+          no-caps
+          outline
+        />
+      </div>
       <!--      <q-input-->
       <!--        :model-value="dataFilter"-->
       <!--        :placeholder="i18n('hints.dataFilter')"-->

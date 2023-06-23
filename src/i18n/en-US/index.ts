@@ -5,8 +5,11 @@ export default {
         hints: {
           dataFilter: 'Filter by raw advertising data',
           nameFilter: 'Filter by name or MAC',
+          namePrefixFilter: 'Filter by name prefix',
         },
         labels: {
+          editManufacturers: 'Edit manufacturers',
+          editServices: 'Edit services',
           noFilter: 'No filter',
         },
       },
