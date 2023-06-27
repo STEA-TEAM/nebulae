@@ -29,9 +29,7 @@ export const useBluetoothStore = defineStore('bluetooth', () => {
     const deviceId = await bluetoothManager.connect(options);
     if (deviceId) {
       recognizedDevices[deviceId] = currentOptionalServices.value;
-      return;
     }
-    console.log(deviceId);
   };
 
   return {

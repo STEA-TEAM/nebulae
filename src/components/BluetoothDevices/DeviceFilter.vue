@@ -37,6 +37,14 @@ const filterLabel = computed(() => {
     : filterArray.join('; ');
 });
 
+const editServices = () => {
+  console.log('editServices');
+};
+
+const editManufacturers = () => {
+  console.log('editServices');
+};
+
 // const checkDataFilter = (event: KeyboardEvent) => {
 //   if (/^.$/.test(event.key) && !/^[0-9a-fA-F]$/.test(event.key)) {
 //     event.preventDefault();
@@ -104,6 +112,7 @@ const filterLabel = computed(() => {
           icon="mdi-chart-donut-variant"
           no-caps
           outline
+          @click="editServices"
         />
         <q-btn
           :label="i18n('labels.editManufacturers')"
@@ -113,6 +122,7 @@ const filterLabel = computed(() => {
           icon="mdi-factory"
           no-caps
           outline
+          @click="editManufacturers"
         />
       </div>
       <!--      <q-input-->
