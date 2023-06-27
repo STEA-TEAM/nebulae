@@ -1,6 +1,9 @@
 <script lang="ts" setup>
+import { extend, useQuasar } from 'quasar';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import ServiceDialog from 'components/BluetoothDevices/ServiceDialog.vue';
+import { buffer2hex } from 'utils/common';
 
 export interface Props {
   modelValue: BluetoothLEScanFilter;
@@ -14,6 +17,7 @@ const filter = computed({
   set: (e) => emit('update:modelValue', e),
 });
 
+const { dialog } = useQuasar();
 const { t } = useI18n();
 const i18n = (relativePath: string) => {
   return t('components.BluetoothDevices.DeviceFilter.' + relativePath);
@@ -27,7 +31,30 @@ const filterLabel = computed(() => {
     filterArray.push(filter.value.name);
   }
   if (filter.value.namePrefix) {
-    filterArray.push(filter.value.name);
+    filterArray.push(filter.value.namePrefix);
+  }
+  if (filter.value.services) {
+    filterArray.push(
+      filter.value.services.map((service) => `${String(service)}(*)`).join(', ')
+    );
+  }
+  if (filter.value.serviceData) {
+    filterArray.push(
+      filter.value.serviceData
+        .map(({ service, dataPrefix, mask }) => {
+          let dataPrefixList: string[] = [];
+          if (dataPrefix) {
+            dataPrefixList.push(`${buffer2hex(dataPrefix)}*`);
+          }
+          if (mask) {
+            dataPrefixList.push(`${buffer2hex(mask)}&`);
+          }
+          return `${String(service)}(${
+            dataPrefixList.length ? dataPrefixList.join(', ') : '*'
+          })`;
+        })
+        .join(', ')
+    );
   }
   if (filter.value.manufacturerData) {
     filterArray.push(filter.value.manufacturerData.join(', '));
@@ -38,25 +65,36 @@ const filterLabel = computed(() => {
 });
 
 const editServices = () => {
-  console.log('editServices');
+  dialog({
+    component: ServiceDialog,
+    componentProps: {
+      services: filter.value.services,
+      serviceData: filter.value.serviceData,
+    },
+  }).onOk(
+    (data: {
+      services: BluetoothServiceUUID[];
+      serviceData: BluetoothServiceDataFilter[];
+    }) => {
+      let currentFilter: {
+        services?: BluetoothServiceUUID[];
+        serviceData?: BluetoothServiceDataFilter[];
+      } = extend({}, filter.value);
+      currentFilter.services = data.services;
+      currentFilter.serviceData = data.serviceData;
+      console.log(currentFilter);
+      filter.value = currentFilter;
+    }
+  );
 };
 
 const editManufacturers = () => {
   console.log('editServices');
 };
-
-// const checkDataFilter = (event: KeyboardEvent) => {
-//   if (/^.$/.test(event.key) && !/^[0-9a-fA-F]$/.test(event.key)) {
-//     event.preventDefault();
-//   }
-// };
-// const updateDataFilter = (value: string | null) => {
-//   dataFilter.value = value ? value?.toUpperCase() : '';
-// };
 </script>
 
 <template>
-  <q-expansion-item group="deviceFilters" switch-toggle-side>
+  <q-expansion-item group="device-filters" switch-toggle-side>
     <template v-slot:header>
       <q-item-section>
         <q-item-label>
@@ -66,7 +104,7 @@ const editManufacturers = () => {
           {{ excludeKeys.join(', ') }}
         </q-item-label>
       </q-item-section>
-      <q-item-section avatar side>
+      <q-item-section side>
         <q-btn
           color="negative"
           flat
@@ -125,25 +163,6 @@ const editManufacturers = () => {
           @click="editManufacturers"
         />
       </div>
-      <!--      <q-input-->
-      <!--        :model-value="dataFilter"-->
-      <!--        :placeholder="i18n('hints.dataFilter')"-->
-      <!--        clearable-->
-      <!--        dense-->
-      <!--        type="search"-->
-      <!--        @keydown="checkDataFilter"-->
-      <!--        @update:modelValue="updateDataFilter"-->
-      <!--      >-->
-      <!--        <template v-slot:before>-->
-      <!--          <q-icon name="mdi-broadcast" />-->
-      <!--        </template>-->
-      <!--        <template v-slot:prepend>-->
-      <!--          <q-icon name="mdi-hexadecimal" />-->
-      <!--        </template>-->
-      <!--        <template v-slot:after>-->
-      <!--          <q-btn dense flat icon="mdi-dots-vertical" round />-->
-      <!--        </template>-->
-      <!--      </q-input>-->
     </div>
   </q-expansion-item>
 </template>
