@@ -10,9 +10,13 @@ export default {
         labels: {
           editManufacturers: 'Edit manufacturers',
           editServices: 'Edit services',
-          noFilter: 'No filter',
         },
       },
+      FilterLabelSection:{
+        labels: {
+          noFilter: 'No filter',
+        },
+      }
     },
     DarkModeButton: {
       labels: {

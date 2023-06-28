@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import { extend, useQuasar } from 'quasar';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import ServiceDialog from 'components/BluetoothDevices/ServiceDialog.vue';
-import { buffer2hex } from 'utils/common';
+
+import ServiceFilterDialog from 'components/BluetoothDevices/ServiceFilterDialog.vue';
+import FilterLabelSection from 'components/BluetoothDevices/FilterLabelSection.vue';
 
 export interface Props {
   modelValue: BluetoothLEScanFilter;
@@ -23,50 +24,13 @@ const i18n = (relativePath: string) => {
   return t('components.BluetoothDevices.DeviceFilter.' + relativePath);
 };
 
-const excludeKeys = ref([]);
-
-const filterLabel = computed(() => {
-  let filterArray = [];
-  if (filter.value.name) {
-    filterArray.push(filter.value.name);
-  }
-  if (filter.value.namePrefix) {
-    filterArray.push(filter.value.namePrefix);
-  }
-  if (filter.value.services) {
-    filterArray.push(
-      filter.value.services.map((service) => `${String(service)}(*)`).join(', ')
-    );
-  }
-  if (filter.value.serviceData) {
-    filterArray.push(
-      filter.value.serviceData
-        .map(({ service, dataPrefix, mask }) => {
-          let dataPrefixList: string[] = [];
-          if (dataPrefix) {
-            dataPrefixList.push(`${buffer2hex(dataPrefix)}*`);
-          }
-          if (mask) {
-            dataPrefixList.push(`${buffer2hex(mask)}&`);
-          }
-          return `${String(service)}(${
-            dataPrefixList.length ? dataPrefixList.join(', ') : '*'
-          })`;
-        })
-        .join(', ')
-    );
-  }
-  if (filter.value.manufacturerData) {
-    filterArray.push(filter.value.manufacturerData.join(', '));
-  }
-  return filterArray.length === 0
-    ? i18n('labels.noFilter')
-    : filterArray.join('; ');
-});
+const editManufacturers = () => {
+  console.log('editManufacturers');
+};
 
 const editServices = () => {
   dialog({
-    component: ServiceDialog,
+    component: ServiceFilterDialog,
     componentProps: {
       services: filter.value.services,
       serviceData: filter.value.serviceData,
@@ -87,23 +51,12 @@ const editServices = () => {
     }
   );
 };
-
-const editManufacturers = () => {
-  console.log('editServices');
-};
 </script>
 
 <template>
   <q-expansion-item group="device-filters" switch-toggle-side>
     <template v-slot:header>
-      <q-item-section>
-        <q-item-label>
-          {{ filterLabel }}
-        </q-item-label>
-        <q-item-label v-if="excludeKeys.length" caption>
-          {{ excludeKeys.join(', ') }}
-        </q-item-label>
-      </q-item-section>
+      <filter-label-section v-model="filter" />
       <q-item-section side>
         <q-btn
           color="negative"
@@ -143,16 +96,6 @@ const editManufacturers = () => {
       </q-input>
       <div class="row q-gutter-sm">
         <q-btn
-          :label="i18n('labels.editServices')"
-          class="col-grow"
-          color="amber"
-          dense
-          icon="mdi-chart-donut-variant"
-          no-caps
-          outline
-          @click="editServices"
-        />
-        <q-btn
           :label="i18n('labels.editManufacturers')"
           class="col-grow"
           color="amber"
@@ -161,6 +104,16 @@ const editManufacturers = () => {
           no-caps
           outline
           @click="editManufacturers"
+        />
+        <q-btn
+          :label="i18n('labels.editServices')"
+          class="col-grow"
+          color="amber"
+          dense
+          icon="mdi-chart-donut-variant"
+          no-caps
+          outline
+          @click="editServices"
         />
       </div>
     </div>
