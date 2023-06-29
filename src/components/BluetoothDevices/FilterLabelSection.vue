@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { buffer2hex } from 'utils/common';
-import { useI18n } from 'vue-i18n';
 
 export interface Props {
   modelValue: BluetoothLEScanFilter;
@@ -21,51 +21,66 @@ const filterLabel = computed(() => {
     filterArray.push(props.modelValue.name);
   }
   if (props.modelValue.namePrefix) {
-    filterArray.push(props.modelValue.namePrefix);
+    filterArray.push(props.modelValue.namePrefix + '*');
   }
   return filterArray.length === 0
     ? i18n('labels.noFilter')
     : filterArray.join('; ');
 });
 
-const filterCaption = computed(() => {
+const serviceFilterCaption = computed(() => {
   let filterArray = [];
   let serviceWithoutFilters: BluetoothServiceUUID[] = [
     ...(props.modelValue.services ?? []),
   ];
   if (props.modelValue.serviceData && props.modelValue.serviceData.length) {
     filterArray.push(
-      props.modelValue.serviceData
-        .map(({ service, dataPrefix, mask }) => {
-          serviceWithoutFilters.splice(
-            serviceWithoutFilters.indexOf(service),
-            1
-          );
-          let dataPrefixList: string[] = [];
-          if (dataPrefix) {
-            dataPrefixList.push(`${buffer2hex(dataPrefix)}*`);
-          }
-          if (mask) {
-            dataPrefixList.push(`${buffer2hex(mask)}&`);
-          }
-          return `${String(service)}(${
-            dataPrefixList.length ? dataPrefixList.join(', ') : '*'
-          })`;
-        })
-        .join(', ')
+      ...props.modelValue.serviceData.map(({ service, dataPrefix, mask }) => {
+        serviceWithoutFilters.splice(serviceWithoutFilters.indexOf(service), 1);
+        let dataPrefixList: string[] = [];
+        if (dataPrefix) {
+          dataPrefixList.push(`${buffer2hex(dataPrefix)}*`);
+        }
+        if (mask) {
+          dataPrefixList.push(`${buffer2hex(mask)}&`);
+        }
+        return `${String(service)}(${
+          dataPrefixList.length ? dataPrefixList.join(', ') : '*'
+        })`;
+      })
     );
   }
   if (serviceWithoutFilters.length) {
     filterArray.push(
-      serviceWithoutFilters.map((service) => `${String(service)}(*)`).join(', ')
+      ...serviceWithoutFilters.map((service) => `${String(service)}(*)`)
     );
-  }
-  if (props.modelValue.manufacturerData) {
-    filterArray.push(props.modelValue.manufacturerData.join(', '));
   }
   return filterArray.length === 0
     ? i18n('labels.noFilter')
-    : filterArray.join('; ');
+    : filterArray.join(', ');
+});
+
+const manufacturerFilterCaption = computed(() => {
+  if (
+    props.modelValue.manufacturerData &&
+    props.modelValue.manufacturerData.length
+  ) {
+    return props.modelValue.manufacturerData
+      .map(({ companyIdentifier, dataPrefix, mask }) => {
+        let dataPrefixList: string[] = [];
+        if (dataPrefix) {
+          dataPrefixList.push(`${buffer2hex(dataPrefix)}*`);
+        }
+        if (mask) {
+          dataPrefixList.push(`${buffer2hex(mask)}&`);
+        }
+        return `0x${companyIdentifier}(${
+          dataPrefixList.length ? dataPrefixList.join(', ') : '*'
+        })`;
+      })
+      .join(', ');
+  }
+  return i18n('labels.noFilter');
 });
 </script>
 
@@ -74,8 +89,11 @@ const filterCaption = computed(() => {
     <q-item-label>
       {{ filterLabel }}
     </q-item-label>
-    <q-item-label v-if="filterCaption" caption>
-      {{ filterCaption }}
+    <q-item-label v-if="manufacturerFilterCaption" caption>
+      {{ i18n('labels.manufacturers') }}{{ manufacturerFilterCaption }}
+    </q-item-label>
+    <q-item-label v-if="serviceFilterCaption" caption>
+      {{ i18n('labels.services') }}{{ serviceFilterCaption }}
     </q-item-label>
   </q-item-section>
 </template>

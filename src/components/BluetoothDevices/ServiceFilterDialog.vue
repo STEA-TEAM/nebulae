@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useDialogPluginComponent } from 'quasar';
 import { Ref, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
 import { buffer2hex, falseThen, hex2buffer } from 'utils/common';
 
 interface ServiceFilterView {
@@ -17,6 +19,11 @@ export interface Props {
 const props = defineProps<Props>();
 
 const { dialogRef, onDialogHide, onDialogOK } = useDialogPluginComponent();
+const { t } = useI18n();
+const i18n = (relativePath: string) => {
+  return t('components.BluetoothDevices.ServiceFilterDialog.' + relativePath);
+};
+
 defineEmits([...useDialogPluginComponent.emits]);
 
 const serviceFilterViewList: Ref<ServiceFilterView[]> = ref([]);
@@ -90,13 +97,13 @@ const onConfirm = () => {
   <q-dialog ref="dialogRef" @hide="onDialogHide">
     <q-card class="q-dialog-plugin hide-scrollbar">
       <q-card-section>
-        <div class="text-h5">Service Filters</div>
+        <div class="text-h5">{{ i18n('labels.title') }}</div>
       </q-card-section>
       <q-card-section class="column q-gutter-y-md">
         <q-btn
           icon="add"
-          label="Add Service"
-          color="accent"
+          :label="i18n('labels.addFilter')"
+          color="primary"
           dense
           no-caps
           @click="
@@ -127,7 +134,7 @@ const onConfirm = () => {
                 >
                   {{
                     serviceFilterView.service.length === 0
-                      ? 'Enter Service ID'
+                      ? i18n('labels.noId')
                       : serviceFilterView.service
                   }}
                 </q-item-label>
@@ -150,7 +157,7 @@ const onConfirm = () => {
                 :model-value="serviceFilterView.service"
                 clearable
                 outlined
-                label="Service ID (name or UUID)"
+                :label="i18n('labels.id')"
                 type="text"
                 @update:model-value="updateServiceId(index, $event)"
               />
@@ -158,7 +165,7 @@ const onConfirm = () => {
                 :model-value="serviceFilterView.dataPrefix"
                 clearable
                 outlined
-                label="Service Data Prefix"
+                :label="i18n('labels.prefix')"
                 type="text"
                 @keydown="checkHexInput"
                 @update:model-value="updateServiceDataPrefix(index, $event)"
@@ -167,7 +174,7 @@ const onConfirm = () => {
                 :model-value="serviceFilterView.mask"
                 clearable
                 outlined
-                label="Service Data Mask"
+                :label="i18n('labels.mask')"
                 type="text"
                 @keydown="checkHexInput"
                 @update:model-value="updateServiceDataMask(index, $event)"
@@ -180,11 +187,16 @@ const onConfirm = () => {
         <q-btn
           color="primary"
           flat
-          label="Confirm"
+          :label="i18n('labels.confirm')"
           no-caps
           @click="onConfirm"
         />
-        <q-btn label="Cancel" no-caps outline @click="onDialogHide" />
+        <q-btn
+          :label="i18n('labels.cancel')"
+          no-caps
+          outline
+          @click="onDialogHide"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>

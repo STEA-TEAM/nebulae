@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useDialogPluginComponent } from 'quasar';
 import { Ref, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
 import { buffer2hex, falseThen, hex2buffer } from 'utils/common';
 
 interface ManufacturerFilterView {
@@ -16,15 +18,26 @@ export interface Props {
 const props = defineProps<Props>();
 
 const { dialogRef, onDialogHide, onDialogOK } = useDialogPluginComponent();
+const { t } = useI18n();
+const i18n = (relativePath: string) => {
+  return t(
+    'components.BluetoothDevices.ManufacturerFilterDialog.' + relativePath
+  );
+};
+
 defineEmits([...useDialogPluginComponent.emits]);
 
 const manufacturerFilterViewList: Ref<ManufacturerFilterView[]> = ref([]);
 
 props.manufacturerData?.forEach((manufacturer) => {
   manufacturerFilterViewList.value.push({
-    companyIdentifier: manufacturer.companyIdentifier.toString(16).toUpperCase(),
-    dataPrefix: currData?.dataPrefix ? buffer2hex(currData.dataPrefix) : '',
-    mask: currData?.mask ? buffer2hex(currData.mask) : '',
+    companyIdentifier: manufacturer.companyIdentifier
+      .toString(16)
+      .toUpperCase(),
+    dataPrefix: manufacturer?.dataPrefix
+      ? buffer2hex(manufacturer.dataPrefix)
+      : '',
+    mask: manufacturer?.mask ? buffer2hex(manufacturer.mask) : '',
   });
 });
 
@@ -47,7 +60,9 @@ const checkHexInput = (event: KeyboardEvent) => {
 };
 
 const updateServiceId = (index: number, value: string | null) => {
-  manufacturerFilterViewList.value[index].service = value ?? '';
+  manufacturerFilterViewList.value[index].companyIdentifier = value
+    ? value?.toUpperCase()
+    : '';
 };
 const updateServiceDataPrefix = (index: number, value: string | null) => {
   manufacturerFilterViewList.value[index].dataPrefix = value
@@ -55,32 +70,29 @@ const updateServiceDataPrefix = (index: number, value: string | null) => {
     : '';
 };
 const updateServiceDataMask = (index: number, value: string | null) => {
-  manufacturerFilterViewList.value[index].mask = value ? value?.toUpperCase() : '';
+  manufacturerFilterViewList.value[index].mask = value
+    ? value?.toUpperCase()
+    : '';
 };
 
 const onConfirm = () => {
-  let services: BluetoothServiceUUID[] = [];
-  let serviceData: BluetoothServiceDataFilter[] = [];
-  manufacturerFilterViewList.value.forEach((serviceFilterView) => {
-    if (serviceFilterView.service.length) {
-      services.push(serviceFilterView.service);
-      if (
-        serviceFilterView.dataPrefix.length ||
-        serviceFilterView.mask.length
-      ) {
-        serviceData.push({
-          service: serviceFilterView.service,
-          dataPrefix: serviceFilterView.dataPrefix.length
-            ? hex2buffer(serviceFilterView.dataPrefix)
-            : undefined,
-          mask: serviceFilterView.mask.length
-            ? hex2buffer(serviceFilterView.mask)
-            : undefined,
-        });
-      }
+  let manufacturerData: BluetoothManufacturerDataFilter[] = [];
+  manufacturerFilterViewList.value.forEach((manufacturerFilterView) => {
+    if (manufacturerFilterView.companyIdentifier.length) {
+      manufacturerData.push({
+        companyIdentifier: Number(
+          '0x' + manufacturerFilterView.companyIdentifier
+        ),
+        dataPrefix: manufacturerFilterView.dataPrefix.length
+          ? hex2buffer(manufacturerFilterView.dataPrefix)
+          : undefined,
+        mask: manufacturerFilterView.mask.length
+          ? hex2buffer(manufacturerFilterView.mask)
+          : undefined,
+      });
     }
   });
-  onDialogOK({ services, serviceData });
+  onDialogOK(manufacturerData);
 };
 </script>
 
@@ -88,18 +100,18 @@ const onConfirm = () => {
   <q-dialog ref="dialogRef" @hide="onDialogHide">
     <q-card class="q-dialog-plugin hide-scrollbar">
       <q-card-section>
-        <div class="text-h5">Service Filters</div>
+        <div class="text-h5">{{ i18n("labels.title")}}</div>
       </q-card-section>
       <q-card-section class="column q-gutter-y-md">
         <q-btn
           icon="add"
-          label="Add Service"
+          :label="i18n('labels.addFilter')"
           color="accent"
           dense
           no-caps
           @click="
             manufacturerFilterViewList.push({
-              service: '',
+              companyIdentifier: '',
               dataPrefix: '',
               mask: '',
             })
@@ -118,15 +130,15 @@ const onConfirm = () => {
                 <q-item-label
                   :class="
                     falseThen(
-                      serviceFilterView.service.length,
+                      serviceFilterView.companyIdentifier.length,
                       'text-grey text-italic'
                     )
                   "
                 >
                   {{
-                    serviceFilterView.service.length === 0
-                      ? 'Enter Service ID'
-                      : serviceFilterView.service
+                    serviceFilterView.companyIdentifier.length === 0
+                      ? i18n('labels.noId')
+                      : serviceFilterView.companyIdentifier
                   }}
                 </q-item-label>
                 <q-item-label v-if="dataFilterLabel(index)" caption>
@@ -139,24 +151,27 @@ const onConfirm = () => {
                   flat
                   icon="mdi-delete"
                   round
-                  @click.prevent.stop="manufacturerFilterViewList.splice(index, 1)"
+                  @click.prevent.stop="
+                    manufacturerFilterViewList.splice(index, 1)
+                  "
                 />
               </q-item-section>
             </template>
             <div class="column q-gutter-y-sm q-pa-sm">
               <q-input
-                :model-value="serviceFilterView.service"
+                :model-value="serviceFilterView.companyIdentifier"
                 clearable
                 outlined
-                label="Service ID (name or UUID)"
+                :label="i18n('labels.id')"
                 type="text"
+                @keydown="checkHexInput"
                 @update:model-value="updateServiceId(index, $event)"
               />
               <q-input
                 :model-value="serviceFilterView.dataPrefix"
                 clearable
                 outlined
-                label="Service Data Prefix"
+                :label="i18n('labels.prefix')"
                 type="text"
                 @keydown="checkHexInput"
                 @update:model-value="updateServiceDataPrefix(index, $event)"
@@ -165,7 +180,7 @@ const onConfirm = () => {
                 :model-value="serviceFilterView.mask"
                 clearable
                 outlined
-                label="Service Data Mask"
+                :label="i18n('labels.mask')"
                 type="text"
                 @keydown="checkHexInput"
                 @update:model-value="updateServiceDataMask(index, $event)"
@@ -178,11 +193,13 @@ const onConfirm = () => {
         <q-btn
           color="primary"
           flat
-          label="Confirm"
+          :label="i18n('labels.confirm')"
           no-caps
           @click="onConfirm"
         />
-        <q-btn label="Cancel" no-caps outline @click="onDialogHide" />
+        <q-btn
+          :label="i18n('labels.cancel')"
+          no-caps outline @click="onDialogHide" />
       </q-card-actions>
     </q-card>
   </q-dialog>

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
+import { useI18n } from 'vue-i18n';
 
 import DeviceFilter from 'components/BluetoothDevices/DeviceFilter.vue';
 import { useBluetoothStore } from 'stores/bluetooth';
@@ -11,6 +12,11 @@ export interface Props {
 withDefaults(defineProps<Props>(), {
   mini: false,
 });
+
+const { t } = useI18n();
+const i18n = (relativePath: string) => {
+  return t('components.BluetoothDevices.' + relativePath);
+};
 
 const { currentFilters } = storeToRefs(useBluetoothStore());
 const { addFilter, connect, removeFilter } = useBluetoothStore();
@@ -27,13 +33,13 @@ const openFilterDialog = () => {
         class="col-grow"
         color="positive"
         dense
-        label="Search Device"
+        :label="i18n('labels.search')"
         no-caps
         @click="connect"
       />
       <q-btn
         :icon="mini ? 'settings' : 'add'"
-        :label="mini ? 'Edit Filters' : 'Add Filter'"
+        :label="i18n(`labels.${mini ? 'editFilters' : 'addFilter'}`)"
         class="col-grow"
         color="accent"
         dense

@@ -1,6 +1,11 @@
 export default {
   components: {
     BluetoothDevices: {
+      labels: {
+        addFilter: 'Add Filter',
+        editFilters: 'Edit Filters',
+        search: 'Search Devices',
+      },
       DeviceFilter: {
         hints: {
           dataFilter: 'Filter by raw advertising data',
@@ -12,11 +17,37 @@ export default {
           editServices: 'Edit services',
         },
       },
-      FilterLabelSection:{
+      FilterLabelSection: {
         labels: {
+          manufacturers: 'Manufacturers: ',
           noFilter: 'No filter',
+          services: 'Services: ',
         },
-      }
+      },
+      ManufacturerFilterDialog: {
+        labels: {
+          addFilter: 'Add Manufacturer Filter',
+          cancel: 'Cancel',
+          confirm: 'Confirm',
+          id: 'Manufacturer ID (UUID)',
+          mask: 'Manufacturer Data Mask',
+          noId: 'Enter Manufacturer ID',
+          prefix: 'Manufacturer Data Prefix',
+          title: 'Edit Manufacturer Filters',
+        },
+      },
+      ServiceFilterDialog: {
+        labels: {
+          addFilter: 'Add Service Filter',
+          cancel: 'Cancel',
+          confirm: 'Confirm',
+          id: 'Service ID (name or UUID)',
+          mask: 'Service Data Mask',
+          noId: 'Enter Service ID',
+          prefix: 'Service Data Prefix',
+          title: 'Edit Service Filters',
+        },
+      },
     },
     DarkModeButton: {
       labels: {

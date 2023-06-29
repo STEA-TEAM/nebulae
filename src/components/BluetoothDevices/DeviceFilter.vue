@@ -3,8 +3,9 @@ import { extend, useQuasar } from 'quasar';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-import ServiceFilterDialog from 'components/BluetoothDevices/ServiceFilterDialog.vue';
 import FilterLabelSection from 'components/BluetoothDevices/FilterLabelSection.vue';
+import ManufacturerFilterDialog from 'components/BluetoothDevices/ManufacturerFilterDialog.vue';
+import ServiceFilterDialog from 'components/BluetoothDevices/ServiceFilterDialog.vue';
 
 export interface Props {
   modelValue: BluetoothLEScanFilter;
@@ -25,7 +26,19 @@ const i18n = (relativePath: string) => {
 };
 
 const editManufacturers = () => {
-  console.log('editManufacturers');
+  dialog({
+    component: ManufacturerFilterDialog,
+    componentProps: {
+      manufacturerData: filter.value.manufacturerData,
+    },
+  }).onOk((manufacturerData: BluetoothManufacturerDataFilter[]) => {
+    let currentFilter: {
+      manufacturerData?: BluetoothManufacturerDataFilter[];
+    } = extend({}, filter.value);
+    currentFilter.manufacturerData = manufacturerData;
+    console.log(currentFilter);
+    filter.value = currentFilter;
+  });
 };
 
 const editServices = () => {
@@ -46,7 +59,6 @@ const editServices = () => {
       } = extend({}, filter.value);
       currentFilter.services = data.services;
       currentFilter.serviceData = data.serviceData;
-      console.log(currentFilter);
       filter.value = currentFilter;
     }
   );
