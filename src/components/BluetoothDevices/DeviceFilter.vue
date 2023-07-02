@@ -25,6 +25,18 @@ const i18n = (relativePath: string) => {
   return t('components.BluetoothDevices.DeviceFilter.' + relativePath);
 };
 
+const updateName = (name: string) => {
+  let currentFilter: { name?: string } = extend({}, filter.value);
+  currentFilter.name = name ?? undefined;
+  filter.value = currentFilter;
+};
+
+const updateNamePrefix = (namePrefix: string) => {
+  let currentFilter: { namePrefix?: string } = extend({}, filter.value);
+  currentFilter.namePrefix = namePrefix ?? undefined;
+  filter.value = currentFilter;
+};
+
 const editManufacturers = () => {
   dialog({
     component: ManufacturerFilterDialog,
@@ -81,10 +93,11 @@ const editServices = () => {
     </template>
     <div class="column q-pa-sm q-gutter-y-sm">
       <q-input
-        v-model="filter['name']"
+        :model-value="filter['name']"
         :placeholder="i18n('hints.nameFilter')"
         clearable
         dense
+        @update:model-value="updateName"
       >
         <template v-slot:before>
           <q-icon name="search" />
@@ -94,10 +107,11 @@ const editServices = () => {
         </template>
       </q-input>
       <q-input
-        v-model="filter['namePrefix']"
+        :model-value="filter['namePrefix']"
         :placeholder="i18n('hints.namePrefixFilter')"
         clearable
         dense
+        @update:model-value="updateNamePrefix"
       >
         <template v-slot:before>
           <q-icon name="mdi-regex" />

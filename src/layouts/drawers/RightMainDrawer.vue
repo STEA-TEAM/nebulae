@@ -72,7 +72,7 @@ const i18n = (relativePath: string) => {
         </q-item>
       </q-list>
     </q-btn-dropdown>
-    <q-tab-panels v-model="tab.name" animated>
+    <q-tab-panels v-model="tab.name">
       <q-tab-panel class="q-pa-none" name="devices">
         <router-view
           :mini="width === RIGHT_DRAWER_WIDTHS.min"

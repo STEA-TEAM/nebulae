@@ -3,7 +3,10 @@ export default {
     BluetoothDevices: {
       labels: {
         addFilter: 'Add Filter',
+        deviceId: 'Device ID: ',
+        deviceName: 'Device Name: ',
         editFilters: 'Edit Filters',
+        noName: 'No Name',
         search: 'Search Devices',
       },
       DeviceFilter: {
@@ -13,8 +16,8 @@ export default {
           namePrefixFilter: 'Filter by name prefix',
         },
         labels: {
-          editManufacturers: 'Edit manufacturers',
-          editServices: 'Edit services',
+          editManufacturers: 'Edit manufacturer filters',
+          editServices: 'Edit service filters',
         },
       },
       FilterLabelSection: {
@@ -34,6 +37,14 @@ export default {
           noId: 'Enter Manufacturer ID',
           prefix: 'Manufacturer Data Prefix',
           title: 'Edit Manufacturer Filters',
+        },
+      },
+      OptionalServices: {
+        labels: {
+          addService: 'Add Service',
+          saveAndLoad: 'Save & Load',
+          serviceId: 'Service ID (name or UUID)',
+          title: 'Optional Services',
         },
       },
       ServiceFilterDialog: {
@@ -78,6 +89,20 @@ export default {
         tabs: {
           devices: 'Devices',
           messages: 'Messages',
+        },
+      },
+    },
+    footers: {
+      BluetoothFooter: {
+        labels: {
+          device: 'Device: ',
+          hex: 'Hex',
+          noDevice: 'No Device',
+          noService: 'No Service',
+          payload: 'Payload',
+          service: 'Service: ',
+          targetDevice: 'Target Device',
+          targetService: 'Target Service',
         },
       },
     },
