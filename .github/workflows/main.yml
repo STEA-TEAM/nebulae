@@ -22,7 +22,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Install Dependencies and Build
-        run: pnpm i && [npm run build-pwa
+        run: pnpm i && pnpm run build-pwa
 
       - name: Deploy to GitHub Pages
         uses: crazy-max/ghaction-github-pages@v3
