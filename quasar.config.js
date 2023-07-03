@@ -11,7 +11,7 @@
 const { configure } = require('quasar/wrappers');
 const path = require('path');
 
-module.exports = configure?.(function (/* ctx */) {
+module.exports = configure?.(function(/* ctx */) {
   return {
     eslint: {
       // fix: true,
@@ -19,7 +19,7 @@ module.exports = configure?.(function (/* ctx */) {
       // exclude: [],
       // rawOptions: {},
       warnings: true,
-      errors: true,
+      errors: true
     },
 
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
@@ -44,14 +44,14 @@ module.exports = configure?.(function (/* ctx */) {
       // 'roboto-font-latin-ext',
 
       'roboto-font', // optional, you are not bound to it
-      'material-icons', // optional, you are not bound to it
+      'material-icons' // optional, you are not bound to it
     ],
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
       target: {
         browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
-        node: 'node16',
+        node: 'node18'
       },
 
       vueRouterMode: 'hash', // available values: 'hash', 'history'
@@ -76,7 +76,7 @@ module.exports = configure?.(function (/* ctx */) {
         assets: path.join(__dirname, './src/assets'),
         css: path.join(__dirname, './src/css'),
         types: path.join(__dirname, './src/types'),
-        utils: path.join(__dirname, './src/utils'),
+        utils: path.join(__dirname, './src/utils')
       },
 
       // viteVuePluginOptions: {},
@@ -92,17 +92,17 @@ module.exports = configure?.(function (/* ctx */) {
             // you need to set `runtimeOnly: false`
             // runtimeOnly: false,
 
-            // you need to set i18n resource including paths !
-            include: path.resolve(__dirname, './src/i18n/**'),
-          },
-        ],
-      ],
+            // you need to set i18n resource including paths!
+            include: path.resolve(__dirname, './src/i18n/**')
+          }
+        ]
+      ]
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
     devServer: {
       // https: true
-      open: false, // opens a browser window automatically
+      open: false // opens a browser window automatically
     },
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
@@ -112,7 +112,7 @@ module.exports = configure?.(function (/* ctx */) {
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack
 
-      // For special cases outside of where the auto-import strategy can have an impact
+      // For special cases outside where the auto-import strategy can have an impact
       // (like functional components as one of the examples),
       // you can manually specify Quasar components/directives to be available everywhere:
       //
@@ -127,8 +127,8 @@ module.exports = configure?.(function (/* ctx */) {
         'Loading',
         'LocalStorage',
         'Notify',
-        'SessionStorage',
-      ],
+        'SessionStorage'
+      ]
     },
 
     // animations: 'all', // --- includes all animations
@@ -164,8 +164,8 @@ module.exports = configure?.(function (/* ctx */) {
       // (gets superseded if process.env.PORT is specified at runtime)
 
       middlewares: [
-        'render', // keep this as the last one
-      ],
+        'render' // keep this as the last one
+      ]
     },
 
     // https://v2.quasar.dev/quasar-cli-vite/developing-pwa/configuring-pwa
@@ -174,7 +174,7 @@ module.exports = configure?.(function (/* ctx */) {
       injectPwaMetaTags: true,
       swFilename: 'sw.js',
       manifestFilename: 'manifest.json',
-      useCredentialsForManifestTag: false,
+      useCredentialsForManifestTag: false
       // useFilenameHashes: true,
       // extendGenerateSWOptions (cfg) {}
       // extendInjectManifestOptions (cfg) {},
@@ -189,7 +189,7 @@ module.exports = configure?.(function (/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-capacitor-apps/configuring-capacitor
     capacitor: {
-      hideSplashscreen: true,
+      hideSplashscreen: true
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-electron-apps/configuring-electron
@@ -215,16 +215,16 @@ module.exports = configure?.(function (/* ctx */) {
       builder: {
         // https://www.electron.build/configuration/configuration
 
-        appId: 'nebulae',
-      },
+        appId: 'nebulae'
+      }
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/developing-browser-extensions/configuring-bex
     bex: {
-      contentScripts: ['my-content-script'],
+      contentScripts: ['my-content-script']
 
       // extendBexScriptsConf (esbuildConf) {}
       // extendBexManifestJson (json) {}
-    },
+    }
   };
 });
