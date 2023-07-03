@@ -12,7 +12,7 @@ const navigations = [
   {
     label: 'serial',
     icon: 'mdi-serial-port',
-    available: true,
+    available: false,
     route: '/serial',
     separator: false,
   },
@@ -26,7 +26,7 @@ const navigations = [
   {
     label: 'hid',
     icon: 'mdi-keyboard-settings',
-    available: true,
+    available: false,
     route: '/hid',
     separator: false,
   },
