@@ -53,8 +53,10 @@ const i18n = (relativePath: string) => {
         :icon="tabItem.icon"
         :label="i18n(`tabs.${tabItem.name}`)"
         :name="tabItem.name"
+        @toggle:drawer="emits('toggle:drawer')"
       />
       <q-btn
+        v-show="screen.lt.md"
         class="q-ml-sm"
         icon="mdi-close"
         flat

@@ -1,7 +1,7 @@
 import { Notify } from 'quasar';
 import { reactive } from 'vue';
-import { useI18n } from 'vue-i18n';
 
+import { i18nInstance } from 'boot/i18n';
 import { BluetoothServerWrapper } from 'types/bluetooth/BluetoothServerWrapper';
 import { sleep } from 'utils/common';
 
@@ -10,6 +10,10 @@ export interface BluetoothDeviceWrapper {
   server: BluetoothServerWrapper;
   services?: BluetoothServiceUUID[];
 }
+
+const i18n = (relativePath: string) => {
+  return i18nInstance.global.t('global.BluetoothManager.' + relativePath);
+};
 
 export class BluetoothManager {
   deviceMap = reactive(new Map<string, BluetoothDeviceWrapper>());
@@ -29,7 +33,10 @@ export class BluetoothManager {
       console.log(this.deviceMap);
       return device;
     } catch (error) {
-      console.warn(error);
+      Notify.create({
+        type: 'warning',
+        message: i18n('labels.canceled'),
+      });
       return;
     }
   }
@@ -49,10 +56,6 @@ export class BluetoothManager {
 
   private initDisconnectHandler(device: BluetoothDevice) {
     device.addEventListener('gattserverdisconnected', async () => {
-      const { t } = useI18n();
-      const i18n = (relativePath: string) => {
-        return t('global.BluetoothManager.' + relativePath);
-      };
       const retryLimit = 3;
       const currentDeviceWrapper = this.deviceMap.get(device.id);
       if (!currentDeviceWrapper) {

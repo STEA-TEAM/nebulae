@@ -14,6 +14,8 @@ withDefaults(defineProps<Props>(), {
   mini: false,
 });
 
+const emits = defineEmits(['toggle:drawer']);
+
 const { t } = useI18n();
 const i18n = (relativePath: string) => {
   return t('components.BluetoothDevices.' + relativePath);
@@ -22,6 +24,12 @@ const i18n = (relativePath: string) => {
 const { recognizedDevices, currentFilters } = storeToRefs(useBluetoothStore());
 const { removeRecognizedDevice, addFilter, connect, removeFilter } =
   useBluetoothStore();
+
+const connectDevice = async () => {
+  if (await connect()) {
+    emits('toggle:drawer');
+  }
+};
 
 const openFilterDialog = () => {
   console.log('openFilterDialog');
@@ -41,7 +49,7 @@ const openFilterDialog = () => {
           dense
           icon="mdi-bluetooth-connect"
           no-caps
-          @click="connect"
+          @click="connectDevice"
         />
         <q-btn
           :icon="mini ? 'settings' : 'add'"

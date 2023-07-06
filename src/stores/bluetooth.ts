@@ -42,7 +42,9 @@ export const useBluetoothStore = defineStore('bluetooth', () => {
     if (device) {
       recognizedDevices[device.id] = device.name ?? null;
       console.log(device.id, device.name);
+      return true;
     }
+    return false;
   };
 
   return {

@@ -9,6 +9,10 @@ export default {
         noName: 'No Name',
         search: 'Search Devices',
       },
+      notifications: {
+        connectSuccess: 'Connected to {name}',
+        connectCancel: 'Failed to connect to {name}',
+      },
       DeviceFilter: {
         hints: {
           dataFilter: 'Filter by raw advertising data',
@@ -69,6 +73,7 @@ export default {
   global: {
     BluetoothManager: {
       labels: {
+        canceled: 'Device search canceled',
         deviceId: 'Device ID: ',
         reconnecting: 'Bluetooth device disconnected, reconnecting...',
         reconnectFailed: 'Bluetooth device reconnect failed, please reconnect manually.',
