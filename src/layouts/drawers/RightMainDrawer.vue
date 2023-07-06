@@ -8,6 +8,8 @@ import { RIGHT_DRAWER_WIDTHS } from 'utils/constants';
 
 const { screen } = useQuasar();
 
+const emits = defineEmits(['toggle:drawer']);
+
 const tabs = [
   {
     name: 'devices',
@@ -30,9 +32,17 @@ const i18n = (relativePath: string) => {
 </script>
 
 <template>
-  <q-drawer :width="width" bordered overlay side="right">
+  <q-drawer
+    :width="screen.gt.sm ? width : screen.width"
+    bordered
+    no-swipe-backdrop
+    no-swipe-close
+    no-swipe-open
+    overlay
+    side="right"
+  >
     <q-tabs
-      v-show="width > RIGHT_DRAWER_WIDTHS.min"
+      v-show="screen.lt.md || width > RIGHT_DRAWER_WIDTHS.min"
       v-model="tab.name"
       inline-label
       no-caps
@@ -44,9 +54,17 @@ const i18n = (relativePath: string) => {
         :label="i18n(`tabs.${tabItem.name}`)"
         :name="tabItem.name"
       />
+      <q-btn
+        class="q-ml-sm"
+        icon="mdi-close"
+        flat
+        square
+        stretch
+        @click="emits('toggle:drawer')"
+      />
     </q-tabs>
     <q-btn-dropdown
-      v-show="width === RIGHT_DRAWER_WIDTHS.min"
+      v-show="screen.gt.sm && width === RIGHT_DRAWER_WIDTHS.min"
       :icon="tab.icon"
       :label="i18n(`tabs.${tab.name}`)"
       class="full-width"

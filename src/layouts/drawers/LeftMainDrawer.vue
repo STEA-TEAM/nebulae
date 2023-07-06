@@ -46,7 +46,14 @@ const i18n = (relativePath: string) => {
 </script>
 
 <template>
-  <q-drawer bordered overlay side="left">
+  <q-drawer
+    bordered
+    no-swipe-backdrop
+    no-swipe-close
+    no-swipe-open
+    overlay
+    side="left"
+  >
     <q-list>
       <template v-for="(navigation, index) in navigations" :key="index">
         <q-item
