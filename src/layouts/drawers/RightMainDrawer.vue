@@ -34,7 +34,7 @@ const i18n = (relativePath: string) => {
 <template>
   <q-drawer
     :width="screen.gt.sm ? width : screen.width"
-    bordered
+    :bordered="screen.gt.sm"
     no-swipe-backdrop
     no-swipe-close
     no-swipe-open
