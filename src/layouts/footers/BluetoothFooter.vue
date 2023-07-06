@@ -23,6 +23,7 @@ const deviceList = computed(() => {
 const deviceLabel = computed(() => {
   let result = i18n('labels.device');
   if (currentDevice.value) {
+    console.log(currentDevice.value?.server.listServices());
     result += currentDevice.value.device.name ?? currentDevice.value.device.id;
   } else {
     result += i18n('labels.noDevice');
@@ -33,6 +34,11 @@ const deviceLabel = computed(() => {
 const serviceLabel = computed(() => {
   let result = i18n('labels.service');
   if (currentService.value) {
+    console.log(
+      currentDevice.value?.server.listCharacteristics(
+        String(currentService.value)
+      )
+    );
     result += currentService.value;
   } else {
     result += i18n('labels.noService');

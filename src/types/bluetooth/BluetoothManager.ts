@@ -1,5 +1,6 @@
 import { Notify } from 'quasar';
 import { reactive } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { BluetoothServerWrapper } from 'types/bluetooth/BluetoothServerWrapper';
 import { sleep } from 'utils/common';
@@ -11,7 +12,7 @@ export interface BluetoothDeviceWrapper {
 }
 
 export class BluetoothManager {
-  deviceMap: Map<string, BluetoothDeviceWrapper> = reactive(new Map());
+  deviceMap = reactive(new Map<string, BluetoothDeviceWrapper>());
 
   async connect(
     options: RequestDeviceOptions
@@ -24,22 +25,7 @@ export class BluetoothManager {
         server: new BluetoothServerWrapper(server),
         services: options.optionalServices,
       });
-      // device.addEventListener('gattserverdisconnected', async () => {
-      //   for (let retryCount = 3; retryCount > 0; retryCount--) {
-      //     Notify.create({
-      //       type: 'warning',
-      //       message: `Bluetooth device disconnected, reconnecting... (${
-      //         4 - retryCount
-      //       }/3)`,
-      //       caption: 'Device ID: ' + device.id,
-      //     });
-      //     if (await this.connectGattServer(device)) {
-      //       return;
-      //     }
-      //     await sleep(3000);
-      //   }
-      //   this.deviceMap.delete(device.id);
-      // });
+      this.initDisconnectHandler(device);
       console.log(this.deviceMap);
       return device;
     } catch (error) {
@@ -59,5 +45,40 @@ export class BluetoothManager {
       throw new Error('server is null');
     }
     return server;
+  }
+
+  private initDisconnectHandler(device: BluetoothDevice) {
+    device.addEventListener('gattserverdisconnected', async () => {
+      const { t } = useI18n();
+      const i18n = (relativePath: string) => {
+        return t('global.BluetoothManager.' + relativePath);
+      };
+      const retryLimit = 3;
+      const currentDeviceWrapper = this.deviceMap.get(device.id);
+      if (!currentDeviceWrapper) {
+        return;
+      }
+      for (let retryCount = 1; retryCount <= retryLimit; retryCount++) {
+        Notify.create({
+          type: 'warning',
+          message:
+            i18n('labels.reconnecting') + ` (${retryCount}/${retryLimit})`,
+          caption: i18n('labels.deviceId') + device.id,
+        });
+        try {
+          const server = await this.connectGattServer(device);
+          currentDeviceWrapper.server = new BluetoothServerWrapper(server);
+          this.deviceMap.set(device.id, currentDeviceWrapper);
+          return;
+        } catch (_) {}
+        await sleep(3000);
+      }
+      Notify.create({
+        type: 'negative',
+        message: i18n('labels.reconnectFailed'),
+        caption: i18n('labels.deviceId') + device.id,
+      });
+      this.deviceMap.delete(device.id);
+    });
   }
 }

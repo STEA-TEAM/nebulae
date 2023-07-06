@@ -66,6 +66,15 @@ export default {
       },
     },
   },
+  global: {
+    BluetoothManager: {
+      labels: {
+        deviceId: 'Device ID: ',
+        reconnecting: 'Bluetooth device disconnected, reconnecting...',
+        reconnectFailed: 'Bluetooth device reconnect failed, please reconnect manually.',
+      }
+    }
+  },
   layouts: {
     drawers: {
       LeftMainDrawer: {
