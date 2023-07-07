@@ -15,9 +15,11 @@
   "dependencies": {
     "@quasar/extras": "^1.16.4",
     "axios": "^1.4.0",
+    "install": "^0.13.0",
     "pinia": "^2.1.4",
     "pinia-plugin-persistedstate": "^3.1.0",
     "quasar": "^2.12.2",
+    "set-interval-async": "^3.0.3",
     "vue": "^3.3.4",
     "vue-i18n": "^9.2.2",
     "vue-router": "^4.2.4"

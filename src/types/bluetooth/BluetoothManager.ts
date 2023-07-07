@@ -5,21 +5,21 @@ import { i18nInstance } from 'boot/i18n';
 import { BluetoothServerWrapper } from 'types/bluetooth/BluetoothServerWrapper';
 import { sleep } from 'utils/common';
 
+const i18n = (relativePath: string) => {
+  return i18nInstance.global.t('global.BluetoothManager.' + relativePath);
+};
+
 export interface BluetoothDeviceWrapper {
   device: BluetoothDevice;
   server: BluetoothServerWrapper;
   services?: BluetoothServiceUUID[];
 }
 
-const i18n = (relativePath: string) => {
-  return i18nInstance.global.t('global.BluetoothManager.' + relativePath);
-};
-
 export class BluetoothManager {
   deviceMap = reactive(new Map<string, BluetoothDeviceWrapper>());
 
   async connect(
-    options: RequestDeviceOptions
+    options: RequestDeviceOptions,
   ): Promise<BluetoothDevice | undefined> {
     try {
       const device = await navigator.bluetooth.requestDevice(options);
@@ -37,12 +37,11 @@ export class BluetoothManager {
         type: 'warning',
         message: i18n('labels.canceled'),
       });
-      return;
     }
   }
 
   private async connectGattServer(
-    device: BluetoothDevice
+    device: BluetoothDevice,
   ): Promise<BluetoothRemoteGATTServer> {
     if (!device?.gatt) {
       throw new Error('GATT is null');
