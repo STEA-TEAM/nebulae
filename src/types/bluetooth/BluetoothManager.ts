@@ -40,6 +40,14 @@ export class BluetoothManager {
     }
   }
 
+  getDeviceWrapper(deviceId: string): BluetoothDeviceWrapper | undefined {
+    return this.deviceMap.get(deviceId);
+  }
+
+  removeDeviceWrapper(deviceId: string) {
+    this.deviceMap.delete(deviceId);
+  }
+
   private async connectGattServer(
     device: BluetoothDevice,
   ): Promise<BluetoothRemoteGATTServer> {

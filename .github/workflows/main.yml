@@ -24,11 +24,11 @@ jobs:
       - name: Install Dependencies and Build
         run: pnpm i --no-frozen-lockfile && pnpm run build-pwa
 
-      - name: Deploy to GitHub Pages
-        uses: crazy-max/ghaction-github-pages@v3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          build_dir: dist/pwa
-          keep_history: false
-          target_branch: gh-pages
+#      - name: Deploy to GitHub Pages
+#        uses: crazy-max/ghaction-github-pages@v3
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          build_dir: dist/pwa
+#          keep_history: false
+#          target_branch: gh-pages
