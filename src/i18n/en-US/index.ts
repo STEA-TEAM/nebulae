@@ -78,6 +78,13 @@ export default {
         reconnecting: 'Bluetooth device disconnected, reconnecting...',
         reconnectFailed: 'Bluetooth device reconnect failed, please reconnect manually.',
       }
+    },
+    SerialManager: {
+      labels: {
+        canceled: 'Serial port search canceled',
+        reconnecting: 'Serial port disconnected, reconnecting...',
+        reconnectFailed: 'Serial port reconnect failed, please reconnect manually.',
+      }
     }
   },
   layouts: {
