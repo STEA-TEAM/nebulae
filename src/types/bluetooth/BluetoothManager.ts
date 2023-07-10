@@ -1,8 +1,15 @@
 import { Notify } from 'quasar';
 import { reactive } from 'vue';
 
+import { i18nInstance } from 'boot/i18n';
 import { BluetoothDeviceWrapper } from 'types/bluetooth/BluetoothDeviceWrapper';
 
+const i18n = (relativePath: string, params: string[] = []) => {
+  return i18nInstance.global.t(
+    'global.BluetoothManager.' + relativePath,
+    params,
+  );
+};
 
 export class BluetoothManager {
   deviceMap = reactive(new Map<string, BluetoothDeviceWrapper>());
@@ -13,13 +20,12 @@ export class BluetoothManager {
     try {
       const device = await navigator.bluetooth.requestDevice(options);
       this.deviceMap.set(device.id, new BluetoothDeviceWrapper(device));
-      this.initDisconnectHandler(device);
       console.log(this.deviceMap);
       return device;
     } catch (error) {
       Notify.create({
         type: 'warning',
-        message: i18n('labels.canceled'),
+        message: i18n('notifications.canceled'),
       });
     }
   }

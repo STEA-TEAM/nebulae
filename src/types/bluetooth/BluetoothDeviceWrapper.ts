@@ -3,54 +3,96 @@ import { Notify } from 'quasar';
 import { i18nInstance } from 'boot/i18n';
 import { sleep } from 'utils/common';
 
-const i18n = (relativePath: string) => {
-  return i18nInstance.global.t('global.BluetoothDeviceWrapper.' + relativePath);
+const i18n = (relativePath: string, params: string[] = []) => {
+  return i18nInstance.global.t(
+    'global.BluetoothDeviceWrapper.' + relativePath,
+    params,
+  );
 };
 
 export class BluetoothDeviceWrapper {
   private device: BluetoothDevice;
-  private server: BluetoothRemoteGATTServer;
-  private services?: BluetoothServiceUUID[];
 
-  constructor(device: BluetoothDevice, services?: BluetoothServiceUUID[]) {
+  constructor(device: BluetoothDevice) {
     this.device = device;
-    this.server = await this.connectGattServer(device);
-    this.services = services;
+    this.initDisconnectHandler();
   }
 
-  async listServices(): Promise<BluetoothRemoteGATTService[]> {
-    return await this.server.getPrimaryServices();
+  async getGattServer(): Promise<BluetoothRemoteGATTServer | undefined> {
+    if (await this.connectGattServer()) {
+      return this.device.gatt;
+    } else {
+      Notify.create({
+        type: 'warning',
+        message: i18n('notifications.noValidGattServer'),
+        caption: i18n('labels.deviceId', [this.device.id]),
+      });
+    }
+  }
+
+  async listPrimaryServices(): Promise<BluetoothRemoteGATTService[]> {
+    return (await this.getGattServer())?.getPrimaryServices() ?? [];
+  }
+
+  async getPrimaryService(
+    serviceId: string,
+  ): Promise<BluetoothRemoteGATTService | undefined> {
+    try {
+      return await (await this.getGattServer())?.getPrimaryService(serviceId);
+    } catch (_) {
+      Notify.create({
+        type: 'warning',
+        message: i18n('notifications.invalidServiceId', [serviceId]),
+        caption: i18n('labels.deviceId', [this.device.id]),
+      });
+    }
   }
 
   async listCharacteristics(
-    serviceId: string
+    serviceId: string,
   ): Promise<BluetoothRemoteGATTCharacteristic[]> {
-    const service = await this.server.getPrimaryService(serviceId);
-    if (!service) {
-      console.warn('Invalid service id');
-      return [];
+    return (
+      (await this.getPrimaryService(serviceId))?.getCharacteristics() ?? []
+    );
+  }
+
+  async getCharacteristic(
+    serviceId: string,
+    characteristicId: string,
+  ): Promise<BluetoothRemoteGATTCharacteristic | undefined> {
+    try {
+      return await (
+        await this.getPrimaryService(serviceId)
+      )?.getCharacteristic(characteristicId);
+    } catch (_) {
+      Notify.create({
+        type: 'warning',
+        message: i18n('notifications.invalidCharacteristicId', [
+          characteristicId,
+        ]),
+        caption:
+          i18n('labels.deviceId', [this.device.id]) +
+          '\n' +
+          i18n('labels.serviceId', [serviceId]),
+      });
     }
-    return await service.getCharacteristics();
   }
 
   async addNotificationListener(
     serviceId: string,
     characteristicId: string,
-    callback: (event: Event) => void
+    callback: (event: Event) => void,
   ): Promise<boolean> {
-    const service = await this.server.getPrimaryService(serviceId);
-    if (!service) {
-      console.warn('Invalid service id');
-      return false;
-    }
-    const characteristic = await service.getCharacteristic(characteristicId);
+    const characteristic = await this.getCharacteristic(
+      serviceId,
+      characteristicId,
+    );
     if (!characteristic) {
-      console.warn('Invalid characteristic id');
       return false;
     }
     (await characteristic.startNotifications()).addEventListener(
       'characteristicvaluechanged',
-      callback
+      callback,
     );
     return true;
   }
@@ -58,63 +100,39 @@ export class BluetoothDeviceWrapper {
   async write(
     serviceUuid: string,
     characteristicUuid: string,
-    value: string
+    value: string,
   ): Promise<boolean> {
-    const service = await this.server?.getPrimaryService(serviceUuid);
-    if (!service) {
-      console.warn('service is null');
-      return false;
-    }
-    const characteristic = await service.getCharacteristic(characteristicUuid);
+    const characteristic = await this.getCharacteristic(
+      serviceUuid,
+      characteristicUuid,
+    );
     if (!characteristic) {
-      console.warn('characteristic is null');
       return false;
     }
     await characteristic.writeValue(new TextEncoder().encode(value));
     return true;
   }
 
-  private async connectGattServer(
-    device: BluetoothDevice,
-  ): Promise<BluetoothRemoteGATTServer> {
-    if (!device?.gatt) {
-      throw new Error('GATT is null');
+  private async connectGattServer(): Promise<boolean> {
+    if (this.device.gatt?.connected) {
+      return true;
     }
-    const server = await device.gatt.connect();
-    if (!server) {
-      throw new Error('server is null');
-    }
-    return server;
+    return (await this.device.gatt?.connect()) !== undefined;
   }
 
-  private initDisconnectHandler(device: BluetoothDevice) {
-    device.addEventListener('gattserverdisconnected', async () => {
-      const retryLimit = 3;
-      const currentDeviceWrapper = this.deviceMap.get(device.id);
-      if (!currentDeviceWrapper) {
-        return;
-      }
-      for (let retryCount = 1; retryCount <= retryLimit; retryCount++) {
+  private initDisconnectHandler() {
+    this.device.addEventListener('gattserverdisconnected', async () => {
+      while (true) {
         Notify.create({
           type: 'warning',
-          message:
-            i18n('labels.reconnecting') + ` (${retryCount}/${retryLimit})`,
-          caption: i18n('labels.deviceId') + device.id,
+          message: i18n('notifications.reconnecting'),
+          caption: i18n('labels.deviceId', [this.device.id]),
         });
-        try {
-          const server = await this.connectGattServer(device);
-          currentDeviceWrapper.server = new BluetoothServerWrapper(server);
-          this.deviceMap.set(device.id, currentDeviceWrapper);
+        if (await this.connectGattServer()) {
           return;
-        } catch (_) {}
+        }
         await sleep(3000);
       }
-      Notify.create({
-        type: 'negative',
-        message: i18n('labels.reconnectFailed'),
-        caption: i18n('labels.deviceId') + device.id,
-      });
-      this.deviceMap.delete(device.id);
     });
   }
 }

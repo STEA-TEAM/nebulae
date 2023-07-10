@@ -1,5 +1,3 @@
-import { BluetoothDeviceWrapper } from 'types/bluetooth/BluetoothDeviceWrapper';
-
 export default {
   components: {
     BluetoothDevices: {
@@ -75,19 +73,30 @@ export default {
   global: {
     BluetoothDeviceWrapper: {
       labels: {
-        canceled: 'Device search canceled',
-        deviceId: 'Device ID: ',
+        deviceId: 'Device ID: {deviceId}',
+        serviceId: 'Service ID: {serviceId}',
+      },
+      notifications: {
+        invalidCharacteristicId:
+          'Invalid characteristic id: {characteristicId}',
+        invalidServiceId: 'Invalid service id: {serviceId}',
+        noValidGattServer: 'No valid GATT server',
         reconnecting: 'Bluetooth device disconnected, reconnecting...',
-        reconnectFailed: 'Bluetooth device reconnect failed, please reconnect manually.',
-      }
+      },
+    },
+    BluetoothManager: {
+      notifications: {
+        canceled: 'Device search canceled',
+      },
     },
     SerialManager: {
       labels: {
         canceled: 'Serial port search canceled',
         reconnecting: 'Serial port disconnected, reconnecting...',
-        reconnectFailed: 'Serial port reconnect failed, please reconnect manually.',
-      }
-    }
+        reconnectFailed:
+          'Serial port reconnect failed, please reconnect manually.',
+      },
+    },
   },
   layouts: {
     drawers: {
