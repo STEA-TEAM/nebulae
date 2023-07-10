@@ -20,12 +20,18 @@ const isHex = ref(false);
 const payload = ref('');
 
 const sendPayload = async () => {
-  sendMessage(
-    currentDevice.value?.id,
-    currentService.value?.uuid,
-    currentCharacteristic.value?.uuid,
-    payload.value,
-  );
+  if (
+    currentDevice.value &&
+    currentService.value &&
+    currentCharacteristic.value
+  ) {
+    await sendMessage(
+      currentDevice.value.id,
+      currentService.value.uuid,
+      currentCharacteristic.value.uuid,
+      payload.value,
+    );
+  }
 };
 </script>
 

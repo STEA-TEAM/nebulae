@@ -26,8 +26,8 @@ const { recognizedDevices, currentFilters } = storeToRefs(useBluetoothStore());
 const { removeRecognizedDevice, addFilter, connect, removeFilter } =
   useBluetoothStore();
 
-const connectDevice = async () => {
-  if (await connect()) {
+const connectDevice = async (deviceId?: string) => {
+  if (await connect(deviceId)) {
     emits('toggle:drawer');
   }
 };
@@ -50,7 +50,7 @@ const openFilterDialog = () => {
           dense
           icon="mdi-bluetooth-connect"
           no-caps
-          @click="connectDevice"
+          @click="connectDevice()"
         />
         <q-btn
           :icon="mini ? 'settings' : 'add'"
@@ -80,6 +80,7 @@ const openFilterDialog = () => {
         :key="index"
         :active="bluetoothManager.deviceMap.has(recognizedDevice.id)"
         active-class="text-positive"
+        @click="connectDevice(deviceId)"
       >
         <q-item-section avatar>
           <q-icon

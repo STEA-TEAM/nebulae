@@ -39,17 +39,21 @@ export const useBluetoothStore = defineStore('bluetooth', () => {
     currentFilters.value.splice(index, 1);
   };
 
-  const connect = async () => {
-    const options: RequestDeviceOptions =
-      currentFilters.value.length === 0
-        ? {
-            acceptAllDevices: true,
-            optionalServices: currentOptionalServices.value,
-          }
-        : {
-            filters: currentFilters.value,
-            optionalServices: currentOptionalServices.value,
-          };
+  const connect = async (recognizedDeviceId?: string) => {
+    let options: RequestDeviceOptions;
+    if (recognizedDeviceId) {
+      options = recognizedDevices[recognizedDeviceId]?.options;
+    } else if (currentFilters.value.length === 0) {
+      options = {
+        acceptAllDevices: true,
+        optionalServices: currentOptionalServices.value,
+      };
+    } else {
+      options = {
+        filters: currentFilters.value,
+        optionalServices: currentOptionalServices.value,
+      };
+    }
     const device = await bluetoothManager.connect(options);
     if (device) {
       recognizedDevices[device.id] = {
@@ -72,12 +76,17 @@ export const useBluetoothStore = defineStore('bluetooth', () => {
     if (!device) {
       return false;
     }
-    await device.write(serviceId, characteristicId, payload);
-    messages[deviceId] ??= [];
-    messages[deviceId].push({
-      type: 'send',
-      data: payload,
-    });
+    try {
+      await device.write(serviceId, characteristicId, payload);
+      messages[deviceId] ??= [];
+      messages[deviceId].push({
+        type: 'send',
+        data: payload,
+      });
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
 
   return {

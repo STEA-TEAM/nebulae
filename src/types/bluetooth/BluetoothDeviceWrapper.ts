@@ -103,7 +103,16 @@ export class BluetoothDeviceWrapper {
     if (!characteristic) {
       return false;
     }
-    await characteristic.writeValue(new TextEncoder().encode(value));
+    try {
+      await characteristic.writeValue(new TextEncoder().encode(value));
+    } catch (e) {
+      Notify.create({
+        type: 'warning',
+        message: i18n('notifications.sendFailed', [(<Error>e).message]),
+        caption: i18n('labels.deviceId', [this.device.id]),
+      });
+      return false;
+    }
     return true;
   }
 

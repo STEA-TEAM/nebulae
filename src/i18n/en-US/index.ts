@@ -95,6 +95,7 @@ export default {
         invalidServiceId: 'Invalid service id: {serviceId}',
         noValidGattServer: 'No valid GATT server',
         reconnecting: 'Bluetooth device disconnected, reconnecting...',
+        sendFailed: 'Failed to send data: {name}',
       },
     },
     BluetoothManager: {
