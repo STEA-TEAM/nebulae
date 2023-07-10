@@ -1,3 +1,5 @@
+import { BluetoothDeviceWrapper } from 'types/bluetooth/BluetoothDeviceWrapper';
+
 export default {
   components: {
     BluetoothDevices: {
@@ -71,7 +73,7 @@ export default {
     },
   },
   global: {
-    BluetoothManager: {
+    BluetoothDeviceWrapper: {
       labels: {
         canceled: 'Device search canceled',
         deviceId: 'Device ID: ',

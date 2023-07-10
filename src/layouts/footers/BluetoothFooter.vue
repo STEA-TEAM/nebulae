@@ -3,7 +3,7 @@ import { computed, Ref, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { bluetoothManager } from 'boot/managers';
-import { BluetoothDeviceWrapper } from 'types/bluetooth/BluetoothManager';
+import { BluetoothDeviceWrapper } from 'types/bluetooth/BluetoothDeviceWrapper';
 
 const { t } = useI18n();
 const i18n = (relativePath: string) => {
@@ -23,7 +23,6 @@ const deviceList = computed(() => {
 const deviceLabel = computed(() => {
   let result = i18n('labels.device');
   if (currentDevice.value) {
-    console.log(currentDevice.value?.server.listServices());
     result += currentDevice.value.device.name ?? currentDevice.value.device.id;
   } else {
     result += i18n('labels.noDevice');
@@ -34,17 +33,21 @@ const deviceLabel = computed(() => {
 const serviceLabel = computed(() => {
   let result = i18n('labels.service');
   if (currentService.value) {
-    console.log(
-      currentDevice.value?.server.listCharacteristics(
-        String(currentService.value)
-      )
-    );
     result += currentService.value;
   } else {
     result += i18n('labels.noService');
   }
   return result;
 });
+
+const updateService = async (service: string) => {
+  currentService.value = service;
+  console.log(
+    await currentDevice.value?.server.listCharacteristics(
+      String(currentService.value)
+    )
+  );
+};
 
 const sendPayload = () => {
   if (
@@ -97,6 +100,7 @@ const sendPayload = () => {
             :options="currentDevice?.services"
             dense
             outlined
+            @update:modelValue="updateService"
           >
             <template v-slot:no-option>
               <q-item>
