@@ -30,7 +30,7 @@ export default store((/* { ssrContext } */) => {
     createPersistedState({
       auto: true,
       key: (id) => `nebulae.${id}`,
-    })
+    }),
   );
   return pinia;
 });

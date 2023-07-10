@@ -64,7 +64,7 @@ export default {
         },
       },
     },
-    BluetoothSelectors:{
+    BluetoothSelectors: {
       labels: {
         characteristic: 'Characteristic: ',
         device: 'Device: ',
@@ -75,7 +75,7 @@ export default {
         targetCharacteristic: 'Target Characteristic',
         targetDevice: 'Target Device',
         targetService: 'Target Service',
-      }
+      },
     },
     DarkModeButton: {
       labels: {

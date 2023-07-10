@@ -1,12 +1,15 @@
 <script lang="ts" setup>
-import { extend, useQuasar } from 'quasar';
+import { storeToRefs } from 'pinia';
+import { useQuasar } from 'quasar';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import ResizeLine from 'components/ResizeLine.vue';
+import { useSettingsStore } from 'stores/settings';
 import { RIGHT_DRAWER_WIDTHS } from 'utils/constants';
 
 const { screen } = useQuasar();
+const { isMobile } = storeToRefs(useSettingsStore());
 
 const emits = defineEmits(['toggle:drawer']);
 
@@ -21,7 +24,10 @@ const tabs = [
   },
 ];
 
-const tab = ref(extend({}, tabs[0]));
+const tab = ref({
+  name: 'devices',
+  icon: 'devices',
+});
 
 const width = ref(screen.width * 0.3);
 
@@ -33,8 +39,8 @@ const i18n = (relativePath: string) => {
 
 <template>
   <q-drawer
-    :width="screen.gt.sm ? width : screen.width"
-    :bordered="screen.gt.sm"
+    :width="isMobile ? screen.width : width"
+    :bordered="!isMobile"
     no-swipe-backdrop
     no-swipe-close
     no-swipe-open
@@ -42,7 +48,7 @@ const i18n = (relativePath: string) => {
     side="right"
   >
     <q-tabs
-      v-show="screen.lt.md || width > RIGHT_DRAWER_WIDTHS.min"
+      v-show="isMobile || width > RIGHT_DRAWER_WIDTHS.min"
       v-model="tab.name"
       inline-label
       no-caps
@@ -56,7 +62,7 @@ const i18n = (relativePath: string) => {
         @toggle:drawer="emits('toggle:drawer')"
       />
       <q-btn
-        v-show="screen.lt.md"
+        v-show="isMobile"
         class="q-ml-sm"
         icon="mdi-close"
         flat
@@ -66,7 +72,7 @@ const i18n = (relativePath: string) => {
       />
     </q-tabs>
     <q-btn-dropdown
-      v-show="screen.gt.sm && width === RIGHT_DRAWER_WIDTHS.min"
+      v-show="!isMobile && width === RIGHT_DRAWER_WIDTHS.min"
       :icon="tab.icon"
       :label="i18n(`tabs.${tab.name}`)"
       class="full-width"
@@ -107,7 +113,7 @@ const i18n = (relativePath: string) => {
       </q-tab-panel>
     </q-tab-panels>
     <resize-line
-      v-show="screen.gt.sm"
+      v-show="!isMobile"
       v-model="width"
       :max-size="RIGHT_DRAWER_WIDTHS.max"
       :min-size="RIGHT_DRAWER_WIDTHS.min"

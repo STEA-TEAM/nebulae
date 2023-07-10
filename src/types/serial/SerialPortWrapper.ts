@@ -7,7 +7,10 @@ export class SerialPortWrapper {
     this.readLoop().then();
   }
 
-  addMessageCallback(callbackId: string, callback: (value: Uint8Array) => void) {
+  addMessageCallback(
+    callbackId: string,
+    callback: (value: Uint8Array) => void,
+  ) {
     this.messageCallbacks.set(callbackId, callback);
   }
 

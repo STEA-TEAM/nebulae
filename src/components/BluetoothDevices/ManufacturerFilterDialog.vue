@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useDialogPluginComponent } from 'quasar';
-import { Ref, ref } from 'vue';
+import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { buffer2hex, falseThen, hex2buffer } from 'utils/common';
@@ -21,13 +21,13 @@ const { dialogRef, onDialogHide, onDialogOK } = useDialogPluginComponent();
 const { t } = useI18n();
 const i18n = (relativePath: string) => {
   return t(
-    'components.BluetoothDevices.ManufacturerFilterDialog.' + relativePath
+    'components.BluetoothDevices.ManufacturerFilterDialog.' + relativePath,
   );
 };
 
 defineEmits([...useDialogPluginComponent.emits]);
 
-const manufacturerFilterViewList: Ref<ManufacturerFilterView[]> = ref([]);
+const manufacturerFilterViewList = ref<ManufacturerFilterView[]>([]);
 
 props.manufacturerData?.forEach((manufacturer) => {
   manufacturerFilterViewList.value.push({
@@ -59,19 +59,25 @@ const checkHexInput = (event: KeyboardEvent) => {
   }
 };
 
-const updateServiceId = (index: number, value: string | null) => {
+const updateServiceId = (index: number, value: string | number | null) => {
   manufacturerFilterViewList.value[index].companyIdentifier = value
-    ? value?.toUpperCase()
+    ? value?.toString().toUpperCase()
     : '';
 };
-const updateServiceDataPrefix = (index: number, value: string | null) => {
+const updateServiceDataPrefix = (
+  index: number,
+  value: string | number | null,
+) => {
   manufacturerFilterViewList.value[index].dataPrefix = value
-    ? value?.toUpperCase()
+    ? value?.toString().toUpperCase()
     : '';
 };
-const updateServiceDataMask = (index: number, value: string | null) => {
+const updateServiceDataMask = (
+  index: number,
+  value: string | number | null,
+) => {
   manufacturerFilterViewList.value[index].mask = value
-    ? value?.toUpperCase()
+    ? value?.toString().toUpperCase()
     : '';
 };
 
@@ -81,7 +87,7 @@ const onConfirm = () => {
     if (manufacturerFilterView.companyIdentifier.length) {
       manufacturerData.push({
         companyIdentifier: Number(
-          '0x' + manufacturerFilterView.companyIdentifier
+          '0x' + manufacturerFilterView.companyIdentifier,
         ),
         dataPrefix: manufacturerFilterView.dataPrefix.length
           ? hex2buffer(manufacturerFilterView.dataPrefix)
@@ -100,7 +106,7 @@ const onConfirm = () => {
   <q-dialog ref="dialogRef" @hide="onDialogHide">
     <q-card class="q-dialog-plugin hide-scrollbar">
       <q-card-section>
-        <div class="text-h5">{{ i18n("labels.title")}}</div>
+        <div class="text-h5">{{ i18n('labels.title') }}</div>
       </q-card-section>
       <q-card-section class="column q-gutter-y-md">
         <q-btn
@@ -131,7 +137,7 @@ const onConfirm = () => {
                   :class="
                     falseThen(
                       serviceFilterView.companyIdentifier.length,
-                      'text-grey text-italic'
+                      'text-grey text-italic',
                     )
                   "
                 >
@@ -199,7 +205,10 @@ const onConfirm = () => {
         />
         <q-btn
           :label="i18n('labels.cancel')"
-          no-caps outline @click="onDialogHide" />
+          no-caps
+          outline
+          @click="onDialogHide"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>

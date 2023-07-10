@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useDialogPluginComponent } from 'quasar';
-import { Ref, ref } from 'vue';
+import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { buffer2hex, falseThen, hex2buffer } from 'utils/common';
@@ -26,7 +26,7 @@ const i18n = (relativePath: string) => {
 
 defineEmits([...useDialogPluginComponent.emits]);
 
-const serviceFilterViewList: Ref<ServiceFilterView[]> = ref([]);
+const serviceFilterViewList = ref<ServiceFilterView[]>([]);
 
 props.services?.forEach((service, index) => {
   const currData = props.serviceData?.[index];
@@ -55,16 +55,24 @@ const checkHexInput = (event: KeyboardEvent) => {
   }
 };
 
-const updateServiceId = (index: number, value: string | null) => {
-  serviceFilterViewList.value[index].service = value ?? '';
+const updateServiceId = (index: number, value: string | number | null) => {
+  serviceFilterViewList.value[index].service = (value ?? '').toString();
 };
-const updateServiceDataPrefix = (index: number, value: string | null) => {
+const updateServiceDataPrefix = (
+  index: number,
+  value: string | number | null,
+) => {
   serviceFilterViewList.value[index].dataPrefix = value
-    ? value?.toUpperCase()
+    ? value?.toString().toUpperCase()
     : '';
 };
-const updateServiceDataMask = (index: number, value: string | null) => {
-  serviceFilterViewList.value[index].mask = value ? value?.toUpperCase() : '';
+const updateServiceDataMask = (
+  index: number,
+  value: string | number | null,
+) => {
+  serviceFilterViewList.value[index].mask = value
+    ? value?.toString().toUpperCase()
+    : '';
 };
 
 const onConfirm = () => {
@@ -128,7 +136,7 @@ const onConfirm = () => {
                   :class="
                     falseThen(
                       serviceFilterView.service.length,
-                      'text-grey text-italic'
+                      'text-grey text-italic',
                     )
                   "
                 >

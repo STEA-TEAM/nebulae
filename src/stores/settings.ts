@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia';
-import { AddressbarColor, colors, Dark } from 'quasar';
-import { computed, Ref, ref } from 'vue';
+import { AddressbarColor, colors, Dark, Screen } from 'quasar';
+import { computed, ref } from 'vue';
 
 const { getPaletteColor } = colors;
 const darkModes = [false, 'auto', true] as const;
 
 export const useSettingsStore = defineStore('settings', () => {
-  const darkMode: Ref<'auto' | boolean> = ref(Dark.mode);
+  const darkMode = ref<'auto' | boolean>(Dark.mode);
   const darkModeColorAndIcon = computed(() => {
     switch (darkMode.value) {
       case false:
@@ -17,10 +17,13 @@ export const useSettingsStore = defineStore('settings', () => {
         return { color: 'yellow', icon: 'dark_mode' };
     }
   });
+
+  const isMobile = computed(() => Screen.lt.md);
+
   const applyDarkMode = () => {
     Dark.set(darkMode.value);
     AddressbarColor.set(
-      Dark.isActive ? getPaletteColor('grey-10') : getPaletteColor('grey-2')
+      Dark.isActive ? getPaletteColor('grey-10') : getPaletteColor('grey-2'),
     );
   };
 
@@ -33,6 +36,7 @@ export const useSettingsStore = defineStore('settings', () => {
   return {
     darkMode,
     darkModeColorAndIcon,
+    isMobile,
     applyDarkMode,
     toggleDarkMode,
   };

@@ -47,12 +47,12 @@ const serviceFilterCaption = computed(() => {
         return `${String(service)}(${
           dataPrefixList.length ? dataPrefixList.join(', ') : '*'
         })`;
-      })
+      }),
     );
   }
   if (serviceWithoutFilters.length) {
     filterArray.push(
-      ...serviceWithoutFilters.map((service) => `${String(service)}(*)`)
+      ...serviceWithoutFilters.map((service) => `${String(service)}(*)`),
     );
   }
   return filterArray.length === 0

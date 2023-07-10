@@ -72,7 +72,7 @@ const editServices = () => {
       currentFilter.services = data.services;
       currentFilter.serviceData = data.serviceData;
       filter.value = currentFilter;
-    }
+    },
   );
 };
 </script>

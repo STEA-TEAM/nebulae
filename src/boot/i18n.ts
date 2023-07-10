@@ -27,7 +27,6 @@ export const i18nInstance = createI18n({
   messages,
 });
 
-
 export default boot(({ app }) => {
   app.use(i18nInstance);
 });

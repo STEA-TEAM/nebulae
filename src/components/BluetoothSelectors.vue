@@ -1,17 +1,23 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { bluetoothManager } from 'boot/managers';
+import { useSettingsStore } from 'stores/settings';
 import { BluetoothDeviceWrapper } from 'types/bluetooth/BluetoothDeviceWrapper';
 
 export interface Props {
+  mobile?: boolean;
   device?: BluetoothDevice;
   service?: BluetoothRemoteGATTService;
   characteristic?: BluetoothRemoteGATTCharacteristic;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  mobile: false,
+});
+
 const emit = defineEmits([
   'update:device',
   'update:service',
@@ -22,6 +28,8 @@ const { t } = useI18n();
 const i18n = (relativePath: string) => {
   return t('components.BluetoothSelectors.' + relativePath);
 };
+
+const { isMobile } = storeToRefs(useSettingsStore());
 
 const deviceList = computed(() =>
   Array.from(bluetoothManager.deviceMap.values()),
@@ -65,13 +73,13 @@ const updateDevice = async (deviceWrapper?: BluetoothDeviceWrapper) => {
   currentDeviceWrapper.value = deviceWrapper;
   currentDevice.value = deviceWrapper?.device;
   serviceList.value = (await deviceWrapper?.listPrimaryServices()) ?? [];
-  updateService(serviceList.value[0]);
+  await updateService(serviceList.value[0]);
   currentCharacteristic.value = undefined;
 };
 </script>
 
 <template>
-  <div class="row q-gutter-x-sm">
+  <div :class="isMobile ? 'column q-gutter-y-sm' : 'row q-gutter-x-sm'">
     <q-select
       v-model="currentDevice"
       :display-value="currentDevice?.name ?? currentDevice?.id"
