@@ -48,61 +48,39 @@ const currentCharacteristic = computed({
   set: (e) => emit('update:characteristic', e),
 });
 
-const deviceLabel = computed(() => {
-  let result = i18n('labels.device');
-  if (currentDevice.value) {
-    result += currentDevice.value.name ?? currentDevice.value.id;
-  } else {
-    result += i18n('labels.noDevice');
-  }
-  return result;
-});
-
-const serviceLabel = computed(() => {
-  let result = i18n('labels.service');
-  if (currentService.value) {
-    result += currentService.value.uuid;
-  } else {
-    result += i18n('labels.noService');
-  }
-  return result;
-});
-
-const characteristicLabel = computed(() => {
-  let result = i18n('labels.characteristic');
-  if (currentCharacteristic.value) {
-    result += currentCharacteristic.value.uuid;
-  } else {
-    result += i18n('labels.noCharacteristic');
-  }
-  return result;
-});
-
-const updateDevice = async (deviceWrapper: BluetoothDeviceWrapper) => {
-  currentDeviceWrapper.value = deviceWrapper;
-  currentDevice.value = deviceWrapper.device;
-  currentService.value = undefined;
-  currentCharacteristic.value = undefined;
-  serviceList.value = await deviceWrapper.listPrimaryServices();
-};
-
-const updateService = async (service: BluetoothRemoteGATTService) => {
+const updateService = async (service?: BluetoothRemoteGATTService) => {
   currentService.value = service;
   currentCharacteristic.value = undefined;
-  characteristicList.value =
-    (await currentDeviceWrapper.value?.listCharacteristics(service.uuid)) ?? [];
+  if (service) {
+    characteristicList.value =
+      (await currentDeviceWrapper.value?.listCharacteristics(service.uuid)) ??
+      [];
+  } else {
+    characteristicList.value = [];
+  }
+  currentCharacteristic.value = characteristicList.value[0];
+};
+
+const updateDevice = async (deviceWrapper?: BluetoothDeviceWrapper) => {
+  currentDeviceWrapper.value = deviceWrapper;
+  currentDevice.value = deviceWrapper?.device;
+  serviceList.value = (await deviceWrapper?.listPrimaryServices()) ?? [];
+  updateService(serviceList.value[0]);
+  currentCharacteristic.value = undefined;
 };
 </script>
 
 <template>
-  <div>
+  <div class="row q-gutter-x-sm">
     <q-select
       v-model="currentDevice"
-      :display-value="deviceLabel"
+      :display-value="currentDevice?.name ?? currentDevice?.id"
       :label="i18n('labels.targetDevice')"
       :options="deviceList"
+      clearable
       dense
       outlined
+      style="min-width: 9rem"
       @update:modelValue="updateDevice"
     >
       <template v-slot:option="{ itemProps, opt }">
@@ -123,20 +101,16 @@ const updateService = async (service: BluetoothRemoteGATTService) => {
     </q-select>
     <q-select
       v-model="currentService"
-      :display-value="serviceLabel"
       :label="i18n('labels.targetService')"
       :options="serviceList"
+      clearable
       dense
+      option-label="uuid"
+      option-value="uuid"
       outlined
+      style="min-width: 10rem"
       @update:modelValue="updateService"
     >
-      <template v-slot:option="{ itemProps, opt }">
-        <q-item v-bind="itemProps">
-          <q-item-section>
-            <q-item-label>{{ opt['uuid'] }}</q-item-label>
-          </q-item-section>
-        </q-item>
-      </template>
       <template v-slot:no-option>
         <q-item>
           <q-item-section class="text-italic text-grey">
@@ -147,19 +121,15 @@ const updateService = async (service: BluetoothRemoteGATTService) => {
     </q-select>
     <q-select
       v-model="currentCharacteristic"
-      :display-value="characteristicLabel"
       :label="i18n('labels.targetCharacteristic')"
       :options="characteristicList"
+      clearable
       dense
+      option-label="uuid"
+      option-value="uuid"
       outlined
+      style="min-width: 12rem"
     >
-      <template v-slot:option="{ itemProps, opt }">
-        <q-item v-bind="itemProps">
-          <q-item-section>
-            <q-item-label>{{ opt['uuid'] }}</q-item-label>
-          </q-item-section>
-        </q-item>
-      </template>
       <template v-slot:no-option>
         <q-item>
           <q-item-section class="text-italic text-grey">

@@ -76,17 +76,15 @@ export const useBluetoothStore = defineStore('bluetooth', () => {
     if (!device) {
       return false;
     }
-    try {
-      await device.write(serviceId, characteristicId, payload);
+    if (await device.write(serviceId, characteristicId, payload)) {
       messages[deviceId] ??= [];
       messages[deviceId].push({
         type: 'send',
         data: payload,
       });
       return true;
-    } catch (error) {
-      return false;
     }
+    return false;
   };
 
   return {

@@ -40,7 +40,6 @@ const sendPayload = async () => {
     <q-toolbar>
       <div class="column q-gutter-y-sm">
         <BluetoothSelectors
-          class="row q-gutter-x-sm"
           v-model:device="currentDevice"
           v-model:service="currentService"
           v-model:characteristic="currentCharacteristic"

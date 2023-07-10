@@ -106,6 +106,7 @@ export class BluetoothDeviceWrapper {
     try {
       await characteristic.writeValue(new TextEncoder().encode(value));
     } catch (e) {
+      console.warn(e);
       Notify.create({
         type: 'warning',
         message: i18n('notifications.sendFailed', [(<Error>e).message]),

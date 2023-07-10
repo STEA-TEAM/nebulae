@@ -80,6 +80,7 @@ const openFilterDialog = () => {
         :key="index"
         :active="bluetoothManager.deviceMap.has(recognizedDevice.id)"
         active-class="text-positive"
+        clickable
         @click="connectDevice(deviceId)"
       >
         <q-item-section avatar>
