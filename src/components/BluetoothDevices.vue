@@ -2,9 +2,10 @@
 import { storeToRefs } from 'pinia';
 import { useI18n } from 'vue-i18n';
 
+import { bluetoothManager } from 'boot/managers';
+import OptionalServices from 'components/BluetoothDevices/OptionalServices.vue';
 import DeviceFilter from 'components/BluetoothDevices/DeviceFilter.vue';
 import { useBluetoothStore } from 'stores/bluetooth';
-import OptionalServices from 'components/BluetoothDevices/OptionalServices.vue';
 
 export interface Props {
   mini?: boolean;
@@ -75,19 +76,27 @@ const openFilterDialog = () => {
     <q-separator />
     <q-list>
       <q-item
-        v-for="(deviceName, deviceId, index) in recognizedDevices"
+        v-for="(recognizedDevice, deviceId, index) in recognizedDevices"
         :key="index"
+        :active="bluetoothManager.deviceMap.has(recognizedDevice.id)"
+        active-class="text-positive"
       >
         <q-item-section avatar>
-          <q-icon name="mdi-bluetooth" />
+          <q-icon
+            :name="
+              bluetoothManager.deviceMap.has(recognizedDevice.id)
+                ? 'mdi-bluetooth'
+                : 'mdi-bluetooth-off'
+            "
+          />
         </q-item-section>
         <q-item-section>
           <q-item-label>
             {{ i18n('labels.deviceName') }}
-            {{ deviceName ?? i18n('labels.noName') }}
+            {{ recognizedDevice.name ?? i18n('labels.noName') }}
           </q-item-label>
-          <q-item-label caption>
-            {{ i18n('labels.deviceId') }}{{ deviceId }}
+          <q-item-label class="text-grey" caption>
+            {{ i18n('labels.deviceId') }}{{ recognizedDevice.id }}
           </q-item-label>
         </q-item-section>
         <q-item-section side>
@@ -99,6 +108,13 @@ const openFilterDialog = () => {
             @click.prevent.stop="removeRecognizedDevice(deviceId)"
           />
         </q-item-section>
+        <q-tooltip
+          anchor="top middle"
+          :offset="[10, 10]"
+          :self="`bottom middle`"
+        >
+          {{ recognizedDevice.options }}
+        </q-tooltip>
       </q-item>
     </q-list>
     <div class="row"></div>

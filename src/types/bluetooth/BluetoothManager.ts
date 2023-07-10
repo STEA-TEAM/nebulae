@@ -20,7 +20,6 @@ export class BluetoothManager {
     try {
       const device = await navigator.bluetooth.requestDevice(options);
       this.deviceMap.set(device.id, new BluetoothDeviceWrapper(device));
-      console.log(this.deviceMap);
       return device;
     } catch (error) {
       Notify.create({
@@ -28,13 +27,5 @@ export class BluetoothManager {
         message: i18n('notifications.canceled'),
       });
     }
-  }
-
-  getDeviceWrapper(deviceId: string): BluetoothDeviceWrapper | undefined {
-    return this.deviceMap.get(deviceId);
-  }
-
-  removeDeviceWrapper(deviceId: string) {
-    this.deviceMap.delete(deviceId);
   }
 }

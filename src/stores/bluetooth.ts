@@ -1,11 +1,23 @@
 import { defineStore } from 'pinia';
-import { reactive, Ref, ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { bluetoothManager } from 'boot/managers';
 
+interface RecognizedDevice {
+  id: string;
+  name?: string;
+  options: RequestDeviceOptions;
+}
+
+interface Message {
+  type: 'send' | 'receive';
+  data: string;
+}
+
 export const useBluetoothStore = defineStore('bluetooth', () => {
-  const recognizedDevices: Record<string, string | null> = reactive({});
-  const currentOptionalServices: Ref<string[]> = ref(['']);
-  const currentFilters: Ref<BluetoothLEScanFilter[]> = ref([]);
+  const recognizedDevices = reactive<Record<string, RecognizedDevice>>({});
+  const currentOptionalServices = ref(['']);
+  const currentFilters = ref<BluetoothLEScanFilter[]>([]);
+  const messages = reactive<Record<string, Message[]>>({});
 
   const removeRecognizedDevice = (id: string) => {
     delete recognizedDevices[id];
@@ -40,22 +52,45 @@ export const useBluetoothStore = defineStore('bluetooth', () => {
           };
     const device = await bluetoothManager.connect(options);
     if (device) {
-      recognizedDevices[device.id] = device.name ?? null;
-      console.log(device.id, device.name);
+      recognizedDevices[device.id] = {
+        id: device.id,
+        name: device.name,
+        options: options,
+      };
       return true;
     }
     return false;
+  };
+
+  const sendMessage = async (
+    deviceId: string,
+    serviceId: string,
+    characteristicId: string,
+    payload: string,
+  ) => {
+    const device = bluetoothManager.deviceMap.get(deviceId);
+    if (!device) {
+      return false;
+    }
+    await device.write(serviceId, characteristicId, payload);
+    messages[deviceId] ??= [];
+    messages[deviceId].push({
+      type: 'send',
+      data: payload,
+    });
   };
 
   return {
     recognizedDevices,
     currentOptionalServices,
     currentFilters,
+    messages,
     removeRecognizedDevice,
     addOptionalService,
     removeOptionalService,
     addFilter,
     removeFilter,
     connect,
+    sendMessage,
   };
 });

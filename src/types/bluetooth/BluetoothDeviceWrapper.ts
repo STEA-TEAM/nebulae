@@ -11,23 +11,18 @@ const i18n = (relativePath: string, params: string[] = []) => {
 };
 
 export class BluetoothDeviceWrapper {
-  private device: BluetoothDevice;
+  device: BluetoothDevice;
 
   constructor(device: BluetoothDevice) {
     this.device = device;
     this.initDisconnectHandler();
+    this.connectGattServer().then((result) => {
+      console.log('connectGattServer result: ' + result);
+    });
   }
 
-  async getGattServer(): Promise<BluetoothRemoteGATTServer | undefined> {
-    if (await this.connectGattServer()) {
-      return this.device.gatt;
-    } else {
-      Notify.create({
-        type: 'warning',
-        message: i18n('notifications.noValidGattServer'),
-        caption: i18n('labels.deviceId', [this.device.id]),
-      });
-    }
+  connected(): boolean {
+    return this.device.gatt?.connected ?? false;
   }
 
   async listPrimaryServices(): Promise<BluetoothRemoteGATTService[]> {
@@ -61,9 +56,8 @@ export class BluetoothDeviceWrapper {
     characteristicId: string,
   ): Promise<BluetoothRemoteGATTCharacteristic | undefined> {
     try {
-      return await (
-        await this.getPrimaryService(serviceId)
-      )?.getCharacteristic(characteristicId);
+      const service = await this.getPrimaryService(serviceId);
+      return await service?.getCharacteristic(characteristicId);
     } catch (_) {
       Notify.create({
         type: 'warning',
@@ -113,13 +107,6 @@ export class BluetoothDeviceWrapper {
     return true;
   }
 
-  private async connectGattServer(): Promise<boolean> {
-    if (this.device.gatt?.connected) {
-      return true;
-    }
-    return (await this.device.gatt?.connect()) !== undefined;
-  }
-
   private initDisconnectHandler() {
     this.device.addEventListener('gattserverdisconnected', async () => {
       while (true) {
@@ -134,5 +121,26 @@ export class BluetoothDeviceWrapper {
         await sleep(3000);
       }
     });
+  }
+
+  private async connectGattServer(): Promise<boolean> {
+    if (this.device.gatt?.connected) {
+      return true;
+    }
+    return (await this.device.gatt?.connect()) !== undefined;
+  }
+
+  private async getGattServer(): Promise<
+    BluetoothRemoteGATTServer | undefined
+  > {
+    if (await this.connectGattServer()) {
+      return this.device.gatt;
+    } else {
+      Notify.create({
+        type: 'warning',
+        message: i18n('notifications.noValidGattServer'),
+        caption: i18n('labels.deviceId', [this.device.id]),
+      });
+    }
   }
 }

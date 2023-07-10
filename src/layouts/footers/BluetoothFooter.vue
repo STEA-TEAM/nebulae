@@ -1,66 +1,31 @@
 <script lang="ts" setup>
-import { computed, Ref, ref } from 'vue';
+import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { bluetoothManager } from 'boot/managers';
-import { BluetoothDeviceWrapper } from 'types/bluetooth/BluetoothDeviceWrapper';
+import BluetoothSelectors from 'components/BluetoothSelectors.vue';
+import { useBluetoothStore } from 'stores/bluetooth';
 
 const { t } = useI18n();
 const i18n = (relativePath: string) => {
   return t('layouts.footers.BluetoothFooter.' + relativePath);
 };
 
-const currentDevice: Ref<BluetoothDeviceWrapper | undefined> = ref();
-const currentService: Ref<BluetoothServiceUUID | undefined> = ref();
-const currentCharacteristic: Ref<string> = ref('');
+const { sendMessage } = useBluetoothStore();
+
+const currentDevice = ref<BluetoothDevice>();
+const currentService = ref<BluetoothRemoteGATTService>();
+const currentCharacteristic = ref<BluetoothRemoteGATTCharacteristic>();
 const isHex = ref(false);
 const payload = ref('');
 
-const deviceList = computed(() => {
-  return Array.from(bluetoothManager.deviceMap.values());
-});
-
-const deviceLabel = computed(() => {
-  let result = i18n('labels.device');
-  if (currentDevice.value) {
-    result += currentDevice.value.device.name ?? currentDevice.value.device.id;
-  } else {
-    result += i18n('labels.noDevice');
-  }
-  return result;
-});
-
-const serviceLabel = computed(() => {
-  let result = i18n('labels.service');
-  if (currentService.value) {
-    result += currentService.value;
-  } else {
-    result += i18n('labels.noService');
-  }
-  return result;
-});
-
-const updateService = async (service: string) => {
-  currentService.value = service;
-  console.log(
-    await currentDevice.value?.server.listCharacteristics(
-      String(currentService.value)
-    )
+const sendPayload = async () => {
+  sendMessage(
+    currentDevice.value?.id,
+    currentService.value?.uuid,
+    currentCharacteristic.value?.uuid,
+    payload.value,
   );
-};
-
-const sendPayload = () => {
-  if (
-    currentDevice.value &&
-    currentService.value &&
-    currentCharacteristic.value
-  ) {
-    currentDevice.value.server.write(
-      currentService.value.toString(),
-      currentCharacteristic.value,
-      payload.value
-    );
-  }
 };
 </script>
 
@@ -68,59 +33,12 @@ const sendPayload = () => {
   <q-footer bordered class="bg-dark q-pa-md">
     <q-toolbar>
       <div class="column q-gutter-y-sm">
-        <div class="row q-gutter-x-sm">
-          <q-select
-            v-model="currentDevice"
-            :display-value="deviceLabel"
-            :label="i18n('labels.targetDevice')"
-            :options="deviceList"
-            dense
-            outlined
-          >
-            <template v-slot:option="{ itemProps, opt }">
-              <q-item v-bind="itemProps">
-                <q-item-section>
-                  <q-item-label>{{ opt['device'].name }}</q-item-label>
-                  <q-item-label caption>{{ opt['device'].id }}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </template>
-            <template v-slot:no-option>
-              <q-item>
-                <q-item-section class="text-italic text-grey">
-                  {{ i18n('labels.noDevice') }}
-                </q-item-section>
-              </q-item>
-            </template>
-          </q-select>
-          <q-select
-            v-model="currentService"
-            :display-value="serviceLabel"
-            :label="i18n('labels.targetService')"
-            :options="currentDevice?.services"
-            dense
-            outlined
-            @update:modelValue="updateService"
-          >
-            <template v-slot:no-option>
-              <q-item>
-                <q-item-section class="text-italic text-grey">
-                  {{ i18n('labels.noService') }}
-                </q-item-section>
-              </q-item>
-            </template>
-          </q-select>
-          <q-input
-            v-model="currentCharacteristic"
-            :disable="currentService === undefined"
-            :placeholder="i18n('labels.payload')"
-            autogrow
-            clearable
-            dense
-            outlined
-            type="text"
-          />
-        </div>
+        <BluetoothSelectors
+          class="row q-gutter-x-sm"
+          v-model:device="currentDevice"
+          v-model:service="currentService"
+          v-model:characteristic="currentCharacteristic"
+        />
         <div class="row q-gutter-x-sm">
           <q-input
             v-model="payload"

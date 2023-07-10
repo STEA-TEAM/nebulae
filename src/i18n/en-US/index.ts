@@ -64,6 +64,19 @@ export default {
         },
       },
     },
+    BluetoothSelectors:{
+      labels: {
+        characteristic: 'Characteristic: ',
+        device: 'Device: ',
+        service: 'Service: ',
+        noCharacteristic: 'No Characteristic',
+        noDevice: 'No Device',
+        noService: 'No Service',
+        targetCharacteristic: 'Target Characteristic',
+        targetDevice: 'Target Device',
+        targetService: 'Target Service',
+      }
+    },
     DarkModeButton: {
       labels: {
         toggleDarkMode: 'Toggle dark mode',
@@ -127,14 +140,8 @@ export default {
     footers: {
       BluetoothFooter: {
         labels: {
-          device: 'Device: ',
           hex: 'Hex',
-          noDevice: 'No Device',
-          noService: 'No Service',
           payload: 'Payload',
-          service: 'Service: ',
-          targetDevice: 'Target Device',
-          targetService: 'Target Service',
         },
       },
     },
