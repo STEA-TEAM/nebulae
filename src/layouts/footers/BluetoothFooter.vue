@@ -1,10 +1,12 @@
 <script lang="ts" setup>
+import {storeToRefs} from 'pinia';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { bluetoothManager } from 'boot/managers';
 import BluetoothSelectors from 'components/BluetoothSelectors.vue';
 import { useBluetoothStore } from 'stores/bluetooth';
+import {useSettingsStore} from 'stores/settings';
 
 const { t } = useI18n();
 const i18n = (relativePath: string) => {
@@ -12,6 +14,7 @@ const i18n = (relativePath: string) => {
 };
 
 const { sendMessage } = useBluetoothStore();
+const { isMobile } = storeToRefs(useSettingsStore());
 
 const currentDevice = ref<BluetoothDevice>();
 const currentService = ref<BluetoothRemoteGATTService>();
@@ -20,6 +23,7 @@ const isHex = ref(false);
 const payload = ref('');
 
 const sendPayload = async () => {
+  console.log(currentCharacteristic);
   if (
     currentDevice.value &&
     currentService.value &&
@@ -38,7 +42,7 @@ const sendPayload = async () => {
 <template>
   <q-footer bordered class="bg-dark q-pa-md">
     <q-toolbar>
-      <div class="column q-gutter-y-sm">
+      <div :class="isMobile ? 'column q-gutter-y-sm' : 'row q-gutter-x-sm'">
         <BluetoothSelectors
           v-model:device="currentDevice"
           v-model:service="currentService"

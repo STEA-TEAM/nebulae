@@ -9,10 +9,6 @@ export default {
         noName: 'No Name',
         search: 'Search Devices',
       },
-      notifications: {
-        connectSuccess: 'Connected to {name}',
-        connectCancel: 'Failed to connect to {name}',
-      },
       DeviceFilter: {
         hints: {
           dataFilter: 'Filter by raw advertising data',
@@ -86,21 +82,15 @@ export default {
   global: {
     BluetoothDeviceWrapper: {
       labels: {
-        deviceId: 'Device ID: {deviceId}',
-        serviceId: 'Service ID: {serviceId}',
+        deviceId: 'Device ID: {0}',
+        serviceId: 'Service ID: {0}',
       },
       notifications: {
-        invalidCharacteristicId:
-          'Invalid characteristic id: {characteristicId}',
-        invalidServiceId: 'Invalid service id: {serviceId}',
+        invalidCharacteristicId: 'Invalid characteristic id: {0}',
+        invalidServiceId: 'Invalid service id: {0}',
         noValidGattServer: 'No valid GATT server',
         reconnecting: 'Bluetooth device disconnected, reconnecting...',
-        sendFailed: 'Failed to send data: {name}',
-      },
-    },
-    BluetoothManager: {
-      notifications: {
-        canceled: 'Device search canceled',
+        sendFailed: 'Failed to send data: {0}',
       },
     },
     SerialManager: {
@@ -159,6 +149,18 @@ export default {
       labels: {
         title: 'NebulaE',
         intro: 'A Hardware Debugging Tool Powered by Quasar',
+      },
+    },
+  },
+  stores: {
+    bluetooth: {
+      labels: {
+        deviceId: 'Device ID: {0}',
+      },
+      notifications: {
+        canceled: 'Device search canceled',
+        connected: 'Connected to Bluetooth GATT server',
+        connecting: 'Connecting Bluetooth GATT server...',
       },
     },
   },

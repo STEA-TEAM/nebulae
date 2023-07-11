@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { storeToRefs } from 'pinia';
-import { useQuasar } from 'quasar';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -8,7 +7,6 @@ import ResizeLine from 'components/ResizeLine.vue';
 import { useSettingsStore } from 'stores/settings';
 import { RIGHT_DRAWER_WIDTHS } from 'utils/constants';
 
-const { screen } = useQuasar();
 const { isMobile } = storeToRefs(useSettingsStore());
 
 const emits = defineEmits(['toggle:drawer']);
@@ -29,7 +27,7 @@ const tab = ref({
   icon: 'devices',
 });
 
-const width = ref(screen.width * 0.3);
+const width = ref(RIGHT_DRAWER_WIDTHS.default);
 
 const { t } = useI18n();
 const i18n = (relativePath: string) => {
@@ -39,7 +37,7 @@ const i18n = (relativePath: string) => {
 
 <template>
   <q-drawer
-    :width="isMobile ? screen.width : width"
+    :width="isMobile ? RIGHT_DRAWER_WIDTHS.full : width"
     :bordered="!isMobile"
     no-swipe-backdrop
     no-swipe-close
