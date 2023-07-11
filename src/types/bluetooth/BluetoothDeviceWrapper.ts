@@ -1,11 +1,10 @@
 import { Notify } from 'quasar';
 
 import { i18nInstance } from 'boot/i18n';
-import { sleep } from 'utils/common';
 
 const i18n = (relativePath: string, params: string[] = []) => {
   return i18nInstance.global.t(
-    'global.BluetoothDeviceWrapper.' + relativePath,
+    'types.BluetoothDeviceWrapper.' + relativePath,
     params,
   );
 };
@@ -15,14 +14,34 @@ export class BluetoothDeviceWrapper {
 
   constructor(device: BluetoothDevice) {
     this.device = device;
-    this.initDisconnectHandler();
-    this.connectGattServer().then((result) => {
-      console.log('connectGattServer result: ' + result);
-    });
   }
 
-  connected(): boolean {
-    return this.device.gatt?.connected ?? false;
+  async connectGattServer(): Promise<boolean> {
+    if (this.device.gatt?.connected || (await this.device.gatt?.connect()) !== undefined) {
+      Notify.create({
+        type: 'positive',
+        message: i18n('notifications.connectSuccess'),
+        caption: i18n('labels.deviceId', [this.device.id]),
+      });
+      return true;
+    }
+    Notify.create({
+      type: 'warning',
+      message: i18n('notifications.connectFailed'),
+      caption: i18n('labels.deviceId', [this.device.id]),
+    });
+    return false;
+  }
+
+  async disconnectGattServer(): Promise<void> {
+    if (this.device.gatt?.connected) {
+      await this.device.gatt?.disconnect();
+      Notify.create({
+        type: 'secondary',
+        message: i18n('notifications.disconnected'),
+        caption: i18n('labels.deviceId', [this.device.id]),
+      });
+    }
   }
 
   async listPrimaryServices(): Promise<BluetoothRemoteGATTService[]> {
@@ -115,29 +134,6 @@ export class BluetoothDeviceWrapper {
       return false;
     }
     return true;
-  }
-
-  private initDisconnectHandler() {
-    this.device.addEventListener('gattserverdisconnected', async () => {
-      while (true) {
-        Notify.create({
-          type: 'warning',
-          message: i18n('notifications.reconnecting'),
-          caption: i18n('labels.deviceId', [this.device.id]),
-        });
-        if (await this.connectGattServer()) {
-          return;
-        }
-        await sleep(3000);
-      }
-    });
-  }
-
-  private async connectGattServer(): Promise<boolean> {
-    if (this.device.gatt?.connected) {
-      return true;
-    }
-    return (await this.device.gatt?.connect()) !== undefined;
   }
 
   private async getGattServer(): Promise<

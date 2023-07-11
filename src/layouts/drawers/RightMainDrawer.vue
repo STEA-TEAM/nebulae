@@ -3,13 +3,12 @@ import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
+import { broadcastManager } from 'boot/managers';
 import ResizeLine from 'components/ResizeLine.vue';
 import { useSettingsStore } from 'stores/settings';
 import { RIGHT_DRAWER_WIDTHS } from 'utils/constants';
 
 const { isMobile } = storeToRefs(useSettingsStore());
-
-const emits = defineEmits(['toggle:drawer']);
 
 const tabs = [
   {
@@ -27,12 +26,27 @@ const tab = ref({
   icon: 'devices',
 });
 
+const isOpened = ref(false);
 const width = ref(RIGHT_DRAWER_WIDTHS.default);
 
 const { t } = useI18n();
 const i18n = (relativePath: string) => {
   return t('layouts.drawers.RightMainDrawer.' + relativePath);
 };
+
+broadcastManager.addMessageCallback('rightDrawer', (message) => {
+  switch (message.action) {
+    case 'open':
+      isOpened.value = true;
+      break;
+    case 'close':
+      isOpened.value = false;
+      break;
+    case 'toggle':
+      isOpened.value = !isOpened.value;
+      break;
+  }
+});
 </script>
 
 <template>
@@ -57,7 +71,6 @@ const i18n = (relativePath: string) => {
         :icon="tabItem.icon"
         :label="i18n(`tabs.${tabItem.name}`)"
         :name="tabItem.name"
-        @toggle:drawer="emits('toggle:drawer')"
       />
       <q-btn
         v-show="isMobile"
@@ -66,7 +79,9 @@ const i18n = (relativePath: string) => {
         flat
         square
         stretch
-        @click="emits('toggle:drawer')"
+        @click="
+          broadcastManager.postMessage('rightDrawer', { action: 'close' })
+        "
       />
     </q-tabs>
     <q-btn-dropdown

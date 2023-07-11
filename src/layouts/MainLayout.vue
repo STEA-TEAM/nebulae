@@ -36,13 +36,11 @@ const toggleRightDrawer = () => {
       :mobile="screen.lt.md"
       :model-value="rightDrawerOpen"
       name="rightDrawer"
-      @toggle:drawer="toggleRightDrawer"
     />
     <router-view
       :mobile="screen.lt.md"
       name="footer"
       @toggle:left-drawer="toggleLeftDrawer"
-      @toggle:right-drawer="toggleRightDrawer"
     />
   </q-layout>
 </template>

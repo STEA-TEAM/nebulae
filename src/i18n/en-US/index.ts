@@ -3,10 +3,7 @@ export default {
     BluetoothDevices: {
       labels: {
         addFilter: 'Add Filter',
-        deviceId: 'Device ID: ',
-        deviceName: 'Device Name: ',
         editFilters: 'Edit Filters',
-        noName: 'No Name',
         search: 'Search Devices',
       },
       DeviceFilter: {
@@ -47,6 +44,13 @@ export default {
           title: 'Optional Services',
         },
       },
+      RecognizedDevices: {
+        labels: {
+          deviceName: 'Device Name: ',
+          noName: 'No Name',
+          deviceId: 'Device ID: ',
+        }
+      },
       ServiceFilterDialog: {
         labels: {
           addFilter: 'Add Service Filter',
@@ -80,19 +84,6 @@ export default {
     },
   },
   global: {
-    BluetoothDeviceWrapper: {
-      labels: {
-        deviceId: 'Device ID: {0}',
-        serviceId: 'Service ID: {0}',
-      },
-      notifications: {
-        invalidCharacteristicId: 'Invalid characteristic id: {0}',
-        invalidServiceId: 'Invalid service id: {0}',
-        noValidGattServer: 'No valid GATT server',
-        reconnecting: 'Bluetooth device disconnected, reconnecting...',
-        sendFailed: 'Failed to send data: {0}',
-      },
-    },
     SerialManager: {
       labels: {
         canceled: 'Serial port search canceled',
@@ -152,15 +143,30 @@ export default {
       },
     },
   },
-  stores: {
-    bluetooth: {
+  types: {
+    BluetoothManager: {
       labels: {
         deviceId: 'Device ID: {0}',
       },
       notifications: {
         canceled: 'Device search canceled',
-        connected: 'Connected to Bluetooth GATT server',
-        connecting: 'Connecting Bluetooth GATT server...',
+        connecting: 'Connecting to device...',
+        reconnecting: 'Bluetooth device disconnected, reconnecting...',
+      },
+    },
+    BluetoothDeviceWrapper: {
+      labels: {
+        deviceId: 'Device ID: {0}',
+        serviceId: 'Service ID: {0}',
+      },
+      notifications: {
+        connectFailed: 'Failed to connect to device',
+        connectSuccess: 'Connected to device',
+        disconnected: 'Bluetooth device disconnected',
+        invalidCharacteristicId: 'Invalid characteristic id: {0}',
+        invalidServiceId: 'Invalid service id: {0}',
+        noValidGattServer: 'No valid GATT server',
+        sendFailed: 'Failed to send data: {0}',
       },
     },
   },

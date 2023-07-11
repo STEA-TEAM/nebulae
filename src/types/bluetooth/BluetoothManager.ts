@@ -3,10 +3,11 @@ import { reactive } from 'vue';
 
 import { i18nInstance } from 'boot/i18n';
 import { BluetoothDeviceWrapper } from 'types/bluetooth/BluetoothDeviceWrapper';
+import { sleep } from 'utils/common';
 
 const i18n = (relativePath: string, params: string[] = []) => {
   return i18nInstance.global.t(
-    'global.BluetoothManager.' + relativePath,
+    'types.BluetoothManager.' + relativePath,
     params,
   );
 };
@@ -19,13 +20,55 @@ export class BluetoothManager {
   ): Promise<BluetoothDevice | undefined> {
     try {
       const device = await navigator.bluetooth.requestDevice(options);
-      this.deviceMap.set(device.id, new BluetoothDeviceWrapper(device));
-      return device;
+      Notify.create({
+        type: 'info',
+        message: i18n('notifications.connecting'),
+        caption: i18n('labels.deviceId', [device.id]),
+      });
+      const deviceWrapper = new BluetoothDeviceWrapper(device);
+      if (await deviceWrapper.connectGattServer()) {
+        this.addDisconnectHandler(deviceWrapper);
+        this.deviceMap.set(device.id, deviceWrapper);
+        return device;
+      }
     } catch (error) {
+      console.warn(error);
       Notify.create({
         type: 'warning',
         message: i18n('notifications.canceled'),
       });
     }
+  }
+
+  async disconnect(deviceId: string) {
+    const deviceWrapper = this.deviceMap.get(deviceId);
+    if (deviceWrapper) {
+      this.removeDisconnectHandler(deviceWrapper);
+      await deviceWrapper.disconnectGattServer();
+      this.deviceMap.delete(deviceId);
+    }
+  }
+
+  private addDisconnectHandler(deviceWrapper: BluetoothDeviceWrapper) {
+    deviceWrapper.device.addEventListener(
+      'gattserverdisconnected',
+      async () => {
+        while (true) {
+          Notify.create({
+            type: 'warning',
+            message: i18n('notifications.reconnecting'),
+            caption: i18n('labels.deviceId', [deviceWrapper.device.id]),
+          });
+          if (await deviceWrapper.connectGattServer()) {
+            return;
+          }
+          await sleep(3000);
+        }
+      },
+    );
+  }
+
+  private removeDisconnectHandler(deviceWrapper: BluetoothDeviceWrapper) {
+    deviceWrapper.device.removeEventListener('gattserverdisconnected', null);
   }
 }
