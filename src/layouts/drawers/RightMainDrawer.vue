@@ -3,10 +3,15 @@ import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-import { broadcastManager } from 'boot/managers';
+import { bus } from 'boot/bus';
 import ResizeLine from 'components/ResizeLine.vue';
 import { useSettingsStore } from 'stores/settings';
 import { RIGHT_DRAWER_WIDTHS } from 'utils/constants';
+
+const { t } = useI18n();
+const i18n = (relativePath: string) => {
+  return t('layouts.drawers.RightMainDrawer.' + relativePath);
+};
 
 const { isMobile } = storeToRefs(useSettingsStore());
 
@@ -25,28 +30,8 @@ const tab = ref({
   name: 'devices',
   icon: 'devices',
 });
-
-const isOpened = ref(false);
 const width = ref(RIGHT_DRAWER_WIDTHS.default);
 
-const { t } = useI18n();
-const i18n = (relativePath: string) => {
-  return t('layouts.drawers.RightMainDrawer.' + relativePath);
-};
-
-broadcastManager.addMessageCallback('rightDrawer', (message) => {
-  switch (message.action) {
-    case 'open':
-      isOpened.value = true;
-      break;
-    case 'close':
-      isOpened.value = false;
-      break;
-    case 'toggle':
-      isOpened.value = !isOpened.value;
-      break;
-  }
-});
 </script>
 
 <template>
@@ -57,6 +42,7 @@ broadcastManager.addMessageCallback('rightDrawer', (message) => {
     no-swipe-close
     no-swipe-open
     overlay
+    persistent
     side="right"
   >
     <q-tabs
@@ -79,9 +65,7 @@ broadcastManager.addMessageCallback('rightDrawer', (message) => {
         flat
         square
         stretch
-        @click="
-          broadcastManager.postMessage('rightDrawer', { action: 'close' })
-        "
+        @click="bus.emit('drawer', 'right', 'close')"
       />
     </q-tabs>
     <q-btn-dropdown

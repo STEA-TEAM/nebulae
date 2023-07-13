@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { useQuasar } from 'quasar';
 import { ref } from 'vue';
+import { bus } from 'boot/bus';
 
 const { screen } = useQuasar();
 const leftDrawerOpen = ref(false);
@@ -13,6 +14,22 @@ const toggleLeftDrawer = () => {
 const toggleRightDrawer = () => {
   rightDrawerOpen.value = !rightDrawerOpen.value;
 };
+
+bus.on('drawer', (position, action) => {
+  const targetDrawer = position === 'left' ? leftDrawerOpen : rightDrawerOpen;
+  switch (action) {
+    case 'open':
+      targetDrawer.value = true;
+      break;
+    case 'close':
+      targetDrawer.value = false;
+      break;
+    case 'toggle':
+      targetDrawer.value = !targetDrawer.value;
+      break;
+  }
+  console.log(position, targetDrawer.value);
+});
 </script>
 
 <template>

@@ -61,8 +61,9 @@ const updateService = async (service?: BluetoothRemoteGATTService) => {
   currentCharacteristic.value = undefined;
   if (service) {
     characteristicList.value =
-      (await currentDeviceWrapper.value?.listCharacteristics(service.uuid)) ??
-      [];
+      (
+        await currentDeviceWrapper.value?.listCharacteristics(service.uuid)
+      )?.filter((characteristic) => characteristic.properties.write) ?? [];
   } else {
     characteristicList.value = [];
   }

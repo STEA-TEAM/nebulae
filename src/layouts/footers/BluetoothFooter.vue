@@ -23,7 +23,6 @@ const isHex = ref(false);
 const payload = ref('');
 
 const sendPayload = async () => {
-  console.log(currentCharacteristic);
   if (
     currentDevice.value &&
     currentService.value &&

@@ -3,7 +3,6 @@ import { reactive } from 'vue';
 
 import { i18nInstance } from 'boot/i18n';
 import { BluetoothDeviceWrapper } from 'types/bluetooth/BluetoothDeviceWrapper';
-import { sleep } from 'utils/common';
 
 const i18n = (relativePath: string, params: string[] = []) => {
   return i18nInstance.global.t(
@@ -27,7 +26,6 @@ export class BluetoothManager {
       });
       const deviceWrapper = new BluetoothDeviceWrapper(device);
       if (await deviceWrapper.connectGattServer()) {
-        this.addDisconnectHandler(deviceWrapper);
         this.deviceMap.set(device.id, deviceWrapper);
         return device;
       }
@@ -43,32 +41,8 @@ export class BluetoothManager {
   async disconnect(deviceId: string) {
     const deviceWrapper = this.deviceMap.get(deviceId);
     if (deviceWrapper) {
-      this.removeDisconnectHandler(deviceWrapper);
       await deviceWrapper.disconnectGattServer();
       this.deviceMap.delete(deviceId);
     }
-  }
-
-  private addDisconnectHandler(deviceWrapper: BluetoothDeviceWrapper) {
-    deviceWrapper.device.addEventListener(
-      'gattserverdisconnected',
-      async () => {
-        while (true) {
-          Notify.create({
-            type: 'warning',
-            message: i18n('notifications.reconnecting'),
-            caption: i18n('labels.deviceId', [deviceWrapper.device.id]),
-          });
-          if (await deviceWrapper.connectGattServer()) {
-            return;
-          }
-          await sleep(3000);
-        }
-      },
-    );
-  }
-
-  private removeDisconnectHandler(deviceWrapper: BluetoothDeviceWrapper) {
-    deviceWrapper.device.removeEventListener('gattserverdisconnected', null);
   }
 }

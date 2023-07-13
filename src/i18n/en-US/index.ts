@@ -2,17 +2,19 @@ export default {
   components: {
     BluetoothDevices: {
       labels: {
-        addFilter: 'Add Filter',
+        deviceFinder: 'Device Finder',
         editFilters: 'Edit Filters',
         search: 'Search Devices',
       },
-      DeviceFilter: {
+      DeviceFilters: {
         hints: {
           dataFilter: 'Filter by raw advertising data',
           nameFilter: 'Filter by name or MAC',
           namePrefixFilter: 'Filter by name prefix',
         },
         labels: {
+          addFilter: 'Add Filter',
+          deviceFilters: 'Device Filters',
           editManufacturers: 'Edit manufacturer filters',
           editServices: 'Edit service filters',
         },
@@ -46,9 +48,10 @@ export default {
       },
       RecognizedDevices: {
         labels: {
+          deviceId: 'Device ID: ',
           deviceName: 'Device Name: ',
           noName: 'No Name',
-          deviceId: 'Device ID: ',
+          recognizedDevices: 'Recognized Devices',
         }
       },
       ServiceFilterDialog: {
@@ -136,6 +139,13 @@ export default {
     },
   },
   pages: {
+    BluetoothPage: {
+      labels: {
+        characteristicId: 'Characteristic ID: {0}',
+        noDevice: 'Add New Device In Right Drawer',
+        serviceId: 'Service ID: {0}',
+      }
+    },
     DashboardPage: {
       labels: {
         title: 'NebulaE',

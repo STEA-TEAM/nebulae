@@ -1,6 +1,8 @@
 import { Notify } from 'quasar';
 
 import { i18nInstance } from 'boot/i18n';
+import { sleep } from 'utils/common';
+import { reactive } from 'vue';
 
 const i18n = (relativePath: string, params: string[] = []) => {
   return i18nInstance.global.t(
@@ -9,15 +11,37 @@ const i18n = (relativePath: string, params: string[] = []) => {
   );
 };
 
+export interface BluetoothMessage {
+  type: 'send' | 'receive';
+  serviceId: string;
+  characteristicId: string;
+  payload: string;
+}
+
 export class BluetoothDeviceWrapper {
+  private isTerminated = false;
   device: BluetoothDevice;
+  messages = reactive<BluetoothMessage[]>([]);
 
   constructor(device: BluetoothDevice) {
     this.device = device;
   }
 
   async connectGattServer(): Promise<boolean> {
-    if (this.device.gatt?.connected || (await this.device.gatt?.connect()) !== undefined) {
+    if (this.device.gatt?.connected) {
+      return true;
+    }
+    if ((await this.device.gatt?.connect()) !== undefined) {
+      this.addDisconnectHandler();
+      for (const service of await this.listPrimaryServices()) {
+        for (const characteristic of await this.listCharacteristics(
+          service.uuid,
+        )) {
+          if (characteristic.properties.notify) {
+            await this.receiveNotification(service.uuid, characteristic.uuid);
+          }
+        }
+      }
       Notify.create({
         type: 'positive',
         message: i18n('notifications.connectSuccess'),
@@ -34,10 +58,11 @@ export class BluetoothDeviceWrapper {
   }
 
   async disconnectGattServer(): Promise<void> {
+    this.isTerminated = true;
     if (this.device.gatt?.connected) {
       await this.device.gatt?.disconnect();
       Notify.create({
-        type: 'secondary',
+        type: 'info',
         message: i18n('notifications.disconnected'),
         caption: i18n('labels.deviceId', [this.device.id]),
       });
@@ -91,10 +116,9 @@ export class BluetoothDeviceWrapper {
     }
   }
 
-  async addNotificationListener(
+  async receiveNotification(
     serviceId: string,
     characteristicId: string,
-    callback: (event: Event) => void,
   ): Promise<boolean> {
     const characteristic = await this.getCharacteristic(
       serviceId,
@@ -103,27 +127,56 @@ export class BluetoothDeviceWrapper {
     if (!characteristic) {
       return false;
     }
-    (await characteristic.startNotifications()).addEventListener(
-      'characteristicvaluechanged',
-      callback,
-    );
+
+    let isRegistered = false;
+    while (!isRegistered) {
+      try {
+        (await characteristic.startNotifications()).addEventListener(
+          'characteristicvaluechanged',
+          (event: Event) => {
+            const value = (<BluetoothRemoteGATTCharacteristic>event.target)
+              .value;
+            if (value) {
+              const payload = new TextDecoder().decode(value);
+              console.log(payload);
+              this.messages.push({
+                type: 'receive',
+                serviceId: serviceId,
+                characteristicId: characteristicId,
+                payload: payload,
+              });
+            }
+          },
+        );
+        isRegistered = true;
+      } catch (e) {
+        console.log(e);
+      }
+      await sleep(10);
+    }
     return true;
   }
 
   async write(
-    serviceUuid: string,
-    characteristicUuid: string,
-    value: string,
+    serviceId: string,
+    characteristicId: string,
+    payload: string,
   ): Promise<boolean> {
     const characteristic = await this.getCharacteristic(
-      serviceUuid,
-      characteristicUuid,
+      serviceId,
+      characteristicId,
     );
     if (!characteristic) {
       return false;
     }
     try {
-      await characteristic.writeValue(new TextEncoder().encode(value));
+      await characteristic.writeValue(new TextEncoder().encode(payload));
+      this.messages.push({
+        type: 'send',
+        serviceId: serviceId,
+        characteristicId: characteristicId,
+        payload: payload,
+      });
     } catch (e) {
       console.warn(e);
       Notify.create({
@@ -134,6 +187,22 @@ export class BluetoothDeviceWrapper {
       return false;
     }
     return true;
+  }
+
+  private addDisconnectHandler() {
+    this.device.addEventListener('gattserverdisconnected', async () => {
+      while (!this.isTerminated) {
+        Notify.create({
+          type: 'warning',
+          message: i18n('notifications.reconnecting'),
+          caption: i18n('labels.deviceId', [this.device.id]),
+        });
+        if (await this.connectGattServer()) {
+          return;
+        }
+        await sleep(3000);
+      }
+    });
   }
 
   private async getGattServer(): Promise<

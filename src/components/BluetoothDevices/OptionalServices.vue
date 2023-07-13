@@ -15,58 +15,61 @@ const saveAndLoad = () => {
   console.log('saveAndLoad');
 };
 
-const updateServiceId = (index: number, value: string | null) => {
-  currentOptionalServices.value[index] = value ?? '';
+const updateServiceId = (index: number, value: string | number | null) => {
+  currentOptionalServices.value[index] = (value ?? '').toString();
 };
 </script>
 
 <template>
-  <div class="column q-pa-sm q-gutter-y-sm">
-    <div class="text-h6">
-      {{ i18n('labels.title') }}
-    </div>
-    <div class="row q-gutter-sm">
-      <q-btn
-        :label="i18n('labels.addService')"
-        class="col-grow"
-        color="primary"
-        dense
-        icon="mdi-chart-donut"
-        no-caps
-        @click="addOptionalService"
-      />
-      <q-btn
-        :label="i18n('labels.saveAndLoad')"
-        class="col-grow"
-        color="accent"
-        dense
-        icon="mdi-book-sync-outline"
-        no-caps
-        @click="saveAndLoad"
-      />
-    </div>
-    <q-input
-      v-for="(currentOptionalService, index) in currentOptionalServices"
-      :key="index"
-      :model-value="currentOptionalService"
-      :placeholder="i18n('labels.serviceId')"
-      clearable
-      dense
-      outlined
-      type="text"
-      @update:model-value="updateServiceId(index, $event)"
-    >
-      <template v-slot:after>
+  <q-card bordered flat>
+    <q-card-section>
+      <div class="row justify-between items-center">
+        <div class="text-h6">
+          {{ i18n('labels.title') }}
+        </div>
         <q-btn
-          color="negative"
-          flat
-          icon="mdi-delete"
-          round
-          @click.prevent.stop="removeOptionalService(index)"
+          :label="i18n('labels.saveAndLoad')"
+          color="accent"
+          dense
+          icon="mdi-book-sync-outline"
+          no-caps
+          @click="saveAndLoad"
         />
-      </template>
-    </q-input>
-  </div>
+        <q-btn
+          :label="i18n('labels.addService')"
+          color="primary"
+          dense
+          icon="mdi-chart-donut"
+          no-caps
+          @click="addOptionalService"
+        />
+      </div>
+    </q-card-section>
+    <q-separator v-show="currentOptionalServices.length" inset />
+    <q-card-section class="q-gutter-y-sm">
+      <q-input
+        v-for="(currentOptionalService, index) in currentOptionalServices"
+        :key="index"
+        :model-value="currentOptionalService"
+        :placeholder="i18n('labels.serviceId')"
+        clearable
+        dense
+        outlined
+        type="text"
+        @update:model-value="updateServiceId(index, $event)"
+      >
+        <template v-slot:after>
+          <q-btn
+            color="negative"
+            flat
+            icon="mdi-delete"
+            round
+            @click.prevent.stop="removeOptionalService(index)"
+          />
+        </template>
+      </q-input>
+    </q-card-section>
+  </q-card>
 </template>
 
 <style scoped></style>
