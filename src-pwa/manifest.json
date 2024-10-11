@@ -1,0 +1,50 @@
+{
+  "background_color": "#ffffff",
+  "categories": ["personalization", "utilities"],
+  "description": "A Hardware Debugging Tool Powered by Quasar",
+  "dir": "ltr",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "icons": [
+    {
+      "src": "icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-256x256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "id": "STEA-TEAM/nebulae",
+  "lang": "en",
+  "name": "NebulaE",
+  "scope": "/",
+  "screenshots": [],
+  "short_name": "NBL",
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "url": "/",
+      "description": "Dashboard"
+    }
+  ],
+  "start_url": "/",
+  "theme_color": "#027be3"
+}
