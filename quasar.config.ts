@@ -93,7 +93,7 @@ export default configure((ctx) => {
       // distDir
 
       extendViteConf(viteConf) {
-        viteConf.base = process.env.DEPLOY_GITHUB_PAGE ? '/STEA-TEAM/' : '/';
+        viteConf.base = process.env.DEPLOY_GITHUB_PAGE ? '/nebulae/' : '/';
       },
       // viteVuePluginOptions: {},
 
