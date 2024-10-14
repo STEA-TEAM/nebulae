@@ -1,7 +1,7 @@
 import { Notify } from 'quasar';
 
 import { i18nInstance } from 'boot/i18n.ts';
-import { createI18n } from 'utils/common';
+import { createI18n, sleep } from 'utils/common';
 import { mergeUint8Arrays } from 'utils/data.ts';
 
 const i18n = createI18n(i18nInstance.global, 'types.SerialPortWrapper.');
@@ -29,9 +29,30 @@ export class SerialPortWrapper {
     this._messageCallbacks.delete(callbackId);
   }
 
+  write(data: Uint8Array) {
+    console.log('write', data);
+    if (this._port.writable) {
+      if (this._port.writable.locked) {
+        return;
+      }
+      const writer = this._port.writable.getWriter();
+      writer.write(data);
+      writer.releaseLock();
+    } else {
+      Notify.create({
+        type: 'warning',
+        message: i18n('notifications.writeError'),
+      });
+    }
+  }
+
   private async readLoop() {
     let buffer = new Uint8Array();
     while (this._port.readable) {
+      if (this._port.readable.locked) {
+        await sleep(50);
+        continue;
+      }
       const reader = this._port.readable.getReader();
       try {
         const { value, done } = await reader.read();

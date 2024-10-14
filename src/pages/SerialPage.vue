@@ -1,8 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { useQuasar } from 'quasar';
+import { reactive, ref } from 'vue';
 
 import { serialManager } from 'boot/managers';
-import LineChart, { LineData } from 'components/DataVisualizers/LineChart.vue';
+import { LineData } from 'components/DataVisualizers/LineChart.vue';
+import { SerialPortWrapper } from 'types/serial/SerialPortWrapper';
+import { hex2buffer } from 'utils/data.ts';
+
+const { notify } = useQuasar();
 
 const baudRates = [
   { label: '110', value: 110 },
@@ -21,7 +26,50 @@ const baudRates = [
   { label: '921600', value: 921600 },
 ];
 
+const colorMatrix = reactive({
+  6: '#000000',
+  5: '#000000',
+  4: '#000000',
+  3: '#000000',
+  2: '#000000',
+  1: '#000000',
+  12: '#000000',
+  11: '#000000',
+  10: '#000000',
+  9: '#000000',
+  8: '#000000',
+  7: '#000000',
+  18: '#000000',
+  17: '#000000',
+  16: '#000000',
+  15: '#000000',
+  14: '#000000',
+  13: '#000000',
+  24: '#000000',
+  23: '#000000',
+  22: '#000000',
+  21: '#000000',
+  20: '#000000',
+  19: '#000000',
+  30: '#000000',
+  29: '#000000',
+  28: '#000000',
+  27: '#000000',
+  26: '#000000',
+  25: '#000000',
+  36: '#000000',
+  35: '#000000',
+  34: '#000000',
+  33: '#000000',
+  32: '#000000',
+  31: '#000000',
+});
+
 const baudRate = ref(115200);
+const isColorData = ref(false);
+const isHexData = ref(false);
+const portWrapper = ref<SerialPortWrapper>();
+const sendData = ref('');
 const sensorDataList = ref<LineData[]>([
   {
     name: 'left',
@@ -38,12 +86,17 @@ const sensorDataList = ref<LineData[]>([
 ]);
 
 const connect = async () => {
-  const portWrapper = await serialManager.connect(baudRate.value);
-  if (!portWrapper) {
+  portWrapper.value = await serialManager.connect(baudRate.value);
+  if (!portWrapper.value) {
     console.error('Failed to connect');
     return;
   }
-  portWrapper.addMessageCallback('main', (message) => {
+  notify({
+    type: 'positive',
+    message: 'Connected',
+  });
+
+  portWrapper.value.addMessageCallback('main', (message) => {
     sensorDataList.value
       .find((data: LineData) => data.name === 'left')
       ?.data.push({
@@ -73,6 +126,25 @@ const connect = async () => {
     }
   });
 };
+
+const setColor = (index: number) => {
+  const addressHex = index.toString(16).padStart(2, '0');
+  sendData.value = `0401${addressHex}${(<string>(<never>colorMatrix)[index]).substring(1)}`;
+  isHexData.value = true;
+  write();
+};
+
+let write = () => {
+  if (!portWrapper.value) {
+    console.error('Not connected');
+    return;
+  }
+  if (isHexData.value) {
+    portWrapper.value.write(new Uint8Array(hex2buffer(sendData.value)));
+  } else {
+    portWrapper.value.write(new TextEncoder().encode(sendData.value));
+  }
+};
 </script>
 
 <template>
@@ -84,7 +156,27 @@ const connect = async () => {
       v-model="baudRate"
     />
     <q-btn color="primary" label="Connect" @click="connect" />
-    <LineChart style="height: 500px" :model-value="sensorDataList" />
+    <q-toggle label="Color Data" v-model="isColorData" />
+    <div v-if="isColorData" class="row justify-center q-pb-xl">
+      <div class="col-6 row">
+        <q-color
+          v-for="(_, name, index ) in colorMatrix"
+          :key="index"
+          class="col-2"
+          format-model="hex"
+          no-header
+          no-footer
+          v-model="colorMatrix[name]"
+          @update:modelValue="setColor(name)"
+        />
+      </div>
+    </div>
+    <div v-else class="row q-gutter-x-md">
+      <q-input class="col-grow" outlined v-model="sendData" />
+      <q-checkbox label="Hex Value" v-model="isHexData" />
+      <q-btn color="primary" label="Send" @click="write" />
+    </div>
+    <!--    <LineChart style="height: 500px" :model-value="sensorDataList" />-->
   </q-page>
 </template>
 
